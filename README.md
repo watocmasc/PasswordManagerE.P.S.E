@@ -1,2 +1,0 @@
-# ManagerPasswords
-Manager for passwords 
