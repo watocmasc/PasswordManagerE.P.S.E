@@ -1,4 +1,4 @@
-import os, json, time, pyperclip
+import os, json, time, pyperclip, help
 
 
 fileData = 'data.json'
@@ -6,92 +6,60 @@ fileData = 'data.json'
 def clearDisplay():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def showData():
+def showData(dataUser):
     # shows the names of the blocks, if they exist
     with open(fileData, 'r') as file:
         data = json.load(file)
 
     if data['datas'] == {}:
-        clearDisplay()
-        ('————————— Error —————————————————————')
-        print('The data does not exist!')
-        ('—————————————————————————————————————')
-        time.sleep(2)
+        print("The data blocks do not exist.\nTip: Start by adding blocks")
         start()
-    else:
-        with open(fileData, 'r') as file:
-            data = json.load(file)
-        
-        order = 1
-        titleData = data['datas'].keys()
-        print(f'————————————————— Titles {20*'—'}')
-        for key in titleData:
-            print(f'{order}.', key)
-            order += 1
-        print(f'{45*'—'}')
-        userChoice = input('Select the name of the data (x): ').strip()
-        clearDisplay()
-        if userChoice.lower() == 'x':
-            start()
-        else:
-            print(f'———————————————— {userChoice} {20*'—'}')
-            try:
-                now_data = ' '.join(data['datas'][userChoice])
-            except KeyError:
-                clearDisplay()
-                print("There's no such name.")
-                time.sleep(1)
-                start()
-            print(now_data)
-            print(f'{(38+len(userChoice))*'—'}')
-            question = input('Copy to clipboard? (x/y): ').lower().strip()
-            if question == 'y' or question == '':
-                clearDisplay()
-                order = input(f'Which one or all of them? (1-{len(data['datas'])}/all): ').lower().strip()
-                if order == 'all':
-                    pyperclip.copy(now_data)
-                else:
-                    pyperclip.copy(data['datas'][userChoice][int(order)-1])
-                start()
-            else:
-                start()
-
-def addData():
     with open(fileData, 'r') as file:
         data = json.load(file)
-
-    print(f'—————————— New name for the block {20*'—'}')
-    titleOfData = input('Name for the data block (x): ').strip()
-    print(f'{54*'—'}')
-
-    if titleOfData in data['datas'] or not(titleOfData):
-        clearDisplay()
-        ('————————— Error —————————————————————')
-        print("ERROR! The name already exists")
-        time.sleep(1)
-        ('—————————————————————————————————————')
-        start()
-    elif titleOfData.lower() == 'x':
-        start()
-    else:
-        print(f'{54*'—'}')
-        parameters = input('Login, password, etc., separated by a space (x): ')
-        print(f'{54*'—'}')
-        if not(parameters):
-            clearDisplay()
-            ('————————— Error —————————————————————')
-            print('ERROR! The field is empty')
-            ('—————————————————————————————————————')
-            time.sleep(1)
+        
+    order = 1
+    listBlocks = data['datas'].keys()
+    print(f'————————————————— Titles {20*'—'}')
+    for key in listBlocks:
+        print(f'{order}.', key)
+        order += 1
+    print(f'{45*'—'}')
+    selectBlock = input('Write the name or number to view: ').strip()
+    order = 0
+    try:
+        for key in listBlocks:
+            if int(selectBlock)-1 == order:
+                print(f'—————————————————{20*'—'}')
+                print(f'{key}:', ''.join(data['datas'][key]))
+                print(f'—————————————————{20*'—'}')
+                start()
+            order += 1
+    except ValueError:
+        try:
+            if data['datas'][selectBlock]:
+                print(f'—————————————————{20*'—'}')
+                print(f'{selectBlock}:',''.join(data['datas'][selectBlock]))
+                print(f'—————————————————{20*'—'}')
+        except KeyError:        
             start()
-        elif parameters.lower() == 'x':
-            start()
-        new_data = {f'{titleOfData}': parameters.split()}
-        data['datas'].update(new_data)
+
+        
+def addData(dataUser):
+    with open(fileData, 'r') as file:
+        base = json.load(file)
+
+    if dataUser[0] in base['datas']:   
+        print('The block name already exists!')
+        start()
+    elif len(dataUser) > 1:
+        new_block = {f'{dataUser[0]}': " ".join(dataUser[1:])}
+        base['datas'].update(new_block)
 
         with open(fileData, 'w') as file:
-            json.dump(data, file)
-        
+            json.dump(base, file)
+        start()
+    else:
+        print("The data for the block is empty!")
         start()
 
 
@@ -217,26 +185,21 @@ def editData():
             start()
 
 selection = {
-        '1': showData,
-        '2': addData,
-        '3': delData,
-        '4': editData
+        'show': showData,
+        'add': addData,
+        'del': delData,
+        'edit': editData
     }
 
 def start():
-    clearDisplay()
-
     while True:
-        userChoice = input('Show (1) / Add (2) / Remove (3) / Edit (4) / Exit (5): ') 
-        if userChoice.lower().strip() == '5':
-            break
+        userChoice = input("Commands' list (l): ").strip().split() 
         try:
-            clearDisplay() # clear
-            selection[userChoice]()
-        except KeyError:
-            print('No action detected!')
-            time.sleep(2)
-            clearDisplay()
-            continue
+            if userChoice[0].lower() == 'exit':
+                break
+            selection[userChoice[0].lower()](userChoice[1:])
+        except (KeyError, IndexError):
+            print(help.helper)
+            
 
 start()
