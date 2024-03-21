@@ -2,7 +2,7 @@ import os, json, time, help
 from termcolor import colored as cd
 
 
-fileData = 'data.json'
+fileData = 'Linux\MacOS/data.json'
 
 def clearDisplay():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -197,14 +197,19 @@ def start():
     if base['code_word'] == '':
         print("ERROR! Try again.")
     else:
-        while True:
-            userChoice = input(cd("Commands' list (l): ", 'yellow')).strip().split() 
-            try:
-                if userChoice[0].lower() == 'exit':
-                    break
-                selection[userChoice[0].lower()](userChoice[1:])
-            except (KeyError, IndexError):
-                print(help.helper)
-            
+        current_password = base['code_word']
+        current_user = input('Enter the code words: ')
+        if current_password == current_user:
+            while True:
+                userChoice = input(cd("Commands' list (l): ", 'yellow')).strip().split() 
+                try:
+                    if userChoice[0].lower() == 'exit':
+                        break
+                    selection[userChoice[0].lower()](userChoice[1:])
+                except (KeyError, IndexError):
+                    print(help.helper)
+        else:
+            print('Access error!')
+
 if __name__ == '__main__':
     start()
