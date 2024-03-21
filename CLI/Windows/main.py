@@ -1,6 +1,6 @@
 import os, json, time, help
 from termcolor import colored as cd
-
+# TODO colorama
 
 fileData = 'data.json'
 
