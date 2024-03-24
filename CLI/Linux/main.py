@@ -1,4 +1,4 @@
-import os, json, time, help
+gimport os, json, time, help
 from termcolor import colored as cd
 
 
@@ -179,6 +179,9 @@ selection = {
     }
 
 def start():
+    from colorama import init
+    from colorama import Fore
+    print(Fore.YELLOW + "Hi there!")
     with open(fileData, 'r') as file:
         base = json.load(file)
     for i in range(5):
