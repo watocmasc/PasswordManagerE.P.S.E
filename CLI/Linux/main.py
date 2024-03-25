@@ -1,218 +1,50 @@
-gimport os, json, time, help
-from termcolor import colored as cd
+import pytermgui as ptg, actions
+import json, config
 
+# base of data
+with open('data.json', 'r') as file:
+    base = json.load(file)    
+# base of data
 
-fileData = 'Linux\MacOS/data.json'
+def addBlock(inx):
+    global show_btn
+    global del_btn
 
-def clearDisplay():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    window.remove(status_data)
+    window.remove(show_btn)
 
-def showData(dataUser):
-    # shows the names of the blocks, if they exist
-    with open(fileData, 'r') as file:
-        data = json.load(file)
+    blockTitle = ptg.InputField(prompt="Name for the block: ")
+    blockData = ptg.InputField(prompt="Data for this block name: ")
+    btnOk = ptg.Button("Ok")
+    btnCancel = ptg.Button("Cancel")
 
-    if data['datas'] == {}:
-        print(cd("The data blocks do not exist.", 'red'))
-        print(cd("Tip: Start by adding blocks", 'green'))
-        start()
-    with open(fileData, 'r') as file:
-        data = json.load(file)
-        
-    order = 1
-    listBlocks = data['datas'].keys()
-    print(f'{20*"—"} Titles {20*"—"}')
-    for key in listBlocks:
-        print(f'{order}.', key)
-        order += 1
-    print(f'{48*"—"}')
-    selectBlock = input('Write the name or number to view: ').strip()
-    order = 0
-    status = None
-    try:
-        for key in listBlocks:
-            if int(selectBlock)-1 == order:
-                status = f"{key}: {''.join(data['datas'][key])}"
-                break
-            order += 1
-        if status:
-            print(f'{48*"—"}')
-            print(cd(status, 'green'))
-            print(f'{48*"—"}')
-        else:
-            print(cd('Error!', 'red'))
-        start()     
-    except ValueError:
-        try:
-            if data['datas'][selectBlock]:
-                print(f'{48*"—"}')
-                print(cd(f"{selectBlock}: {''.join(data['datas'][selectBlock])}", 'green'))
-                print(f'{48*"—"}')
-            else:
-                print(cd('Error!', 'red'))
-            start()
-        except KeyError:        
-            start()
+    window.__add__(blockTitle)
+    window.__add__(blockData)
+    window.__add__((btnOk, btnCancel))
 
-        
-def addBlock(dataUser):
-    with open(fileData, 'r') as file:
-        base = json.load(file)
+with ptg.WindowManager() as manager:
+    loader = ptg.YamlLoader()
+    namespace = loader.load(config.CONFIG_MENU)
 
-    if dataUser[0] in base['datas']:   
-        print(cd('The block name already exists!', 'red'))
-        start()
-    elif len(dataUser) > 1:
-        new_block = {f'{dataUser[0]}': " ".join(dataUser[1:])}
-        base['datas'].update(new_block)
+    status_data = ptg.Label("")
+    if base['datas'] == {}:
+        status_data.value = "Tip: There is no data, try adding a new data block"    
 
-        with open(fileData, 'w') as file:
-            json.dump(base, file)
-        print(cd('The data block was successfully added.', 'green'))
-        start()
-    else:
-        print(cd("The data for the block is empty!", 'red'))
-        start()
+    add_btn = ptg.Button(" Insert ", onclick=addBlock)
+    show_btn = ptg.Button("  Show  ")
+    del_btn = ptg.Button(" Delete ")
+    edit_btn = ptg.Button("  Edit  ")
+    menu = (show_btn,del_btn,edit_btn)
+    window = ptg.Window(
+        "","",status_data,add_btn,"","","","","",
+        menu
+    )
+    window.center(0)
+    window.set_title("Password Manager")
+    window.width = 70
+    window.height = 12
+    window.min_width = 70
+    manager.add(window)
 
-def delBlock(dataUser):
-    with open(fileData, 'r') as file:
-        data = json.load(file)
-
-    if data['datas'] == {}:
-        print(cd('The data does not exist!', 'red'))
-        start()
-    else:
-        order = 1
-        listBlocks = data['datas'].keys()
-
-        print(f'{20*"—"} Titles {20*"—"}')
-        for key in listBlocks:
-            print(f'{order}.', key)
-            order += 1
-        print(f'{48*"—"}')
-
-        selectBlock = input('Write the name or number to view: ').strip()
-        order = 0
-        delBlock = None
-        try:
-            for key in listBlocks:
-                if int(selectBlock)-1 == order:
-                    delBlock = key
-                    break
-                order += 1
-            if delBlock:
-                print(f'{48*"—"}')
-                print(cd(f"{delBlock}: {data['datas'][delBlock]}", 'red'))
-                print(f'{48*"—"}')
-                choice = input(f"Delete a block of data? ({cd('Y', 'green')}/{cd('n', 'red')}): ")
-                if choice == 'Y':
-                    data['datas'].pop(key)
-                    with open(fileData, 'w') as file:
-                        json.dump(data, file)
-            else:
-                print(cd('Error!', 'red'))
-            start() 
-        except ValueError:
-            try:
-                if selectBlock in data['datas']:
-                    print(f'{48*"—"}')
-                    print(cd(f'{selectBlock}: {data["datas"][selectBlock]}', 'red'))
-                    print(f'{48*"—"}')
-                    choice = input(f"Delete a block of data? ({cd('Y', 'green')}/{cd('n', 'red')}): ")
-                    if choice == 'Y':
-                        data['datas'].pop(selectBlock)
-                        with open(fileData, 'w') as file:
-                            json.dump(data, file)
-                else:
-                    print(cd('Error!', 'red'))
-                start()
-            except KeyError:        
-                start()
-'''
-def editData():
-    with open(fileData, 'r') as file:
-        data = json.load(file)
-    
-    if data['datas'] == {}:
-        clearDisplay()
-        ('————————— Error —————————————————————')
-        print('The data does not exist!')
-        ('—————————————————————————————————————')
-        time.sleep(1)
-        start()
-    else:
-        order = 1
-        titleData = data['datas'].keys()
-        print(f'———————————————— Titles {20*'—'}')
-        for key in titleData:
-            print(f'{order}.', key)
-            order += 1
-        print(f'{44*'—'}')
-        userTitle = input('Select a title to edit: ')
-        if userTitle.strip() not in data['datas']:
-            clearDisplay()
-            ('————————— Error —————————————————————')
-            print("There's no such name!")
-            ('—————————————————————————————————————')
-            time.sleep(1)
-            start()
-        else:
-            clearDisplay()
-            print(f'————————— Old version {20*'—'}')
-            print(' '.join(data['datas'][userTitle]))
-            print(f'{42*'—'}')
-            print(f'\n———————— New version {20*'—'}')
-            userChoice = input('Write in the changes: ')
-            if userChoice.lower().strip() == 'x':
-                start()
-            print(f'{42*'—'}')
-            data['datas'][userTitle] = userChoice.split()
-            with open(fileData, 'w') as file:
-                    json.dump(data, file)
-            start()
-'''
-selection = {
-        'show': showData,
-        'add': addBlock,
-        'delete': delBlock,
-        #'edit': editBlock
-    }
-
-def start():
-    from colorama import init
-    from colorama import Fore
-    print(Fore.YELLOW + "Hi there!")
-    with open(fileData, 'r') as file:
-        base = json.load(file)
-    for i in range(5):
-        if base['code_word'] == '':
-            print(cd("Code words are needed to log into your database!", 'red'))
-            code_word = input(cd("Come up with 5 code words: ", 'green')).strip()
-            if len(code_word.split()) == 5:
-                base['code_word'] = code_word
-                with open(fileData, 'w') as file:
-                    json.dump(base, file)
-                break
-            else:
-                print(cd("The number of code words is not equal to 5!", 'red'))
-        else:
-            break
-    if base['code_word'] == '':
-        print("ERROR! Try again.")
-    else:
-        current_password = base['code_word']
-        current_user = input('Enter the code words: ')
-        if current_password == current_user:
-            while True:
-                userChoice = input(cd("Commands' list (l): ", 'yellow')).strip().split() 
-                try:
-                    if userChoice[0].lower() == 'exit':
-                        break
-                    selection[userChoice[0].lower()](userChoice[1:])
-                except (KeyError, IndexError):
-                    print(help.helper)
-        else:
-            print('Access error!')
-
-if __name__ == '__main__':
-    start()
+if base['datas'] == {}:
+    status_data.value = "There is no data, try adding a new data block"
