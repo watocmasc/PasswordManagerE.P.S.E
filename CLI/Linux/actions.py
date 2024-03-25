@@ -53,19 +53,7 @@ def showData(dataUser):
             start()
 
         
-def addBlock(inx):
-    with open(fileData, 'r') as file:
-        base = json.load(file)
 
-    window.remove(status_data)
-    blockTitle = ptg.InputField(prompt="Name for the block: ")
-    blockData = ptg.InputField(prompt="Data for this block name: ")
-    btnOk = ptg.Button("Ok")
-    btnCancel = ptg.Button("Cancel")
-    window.remove((add_btn,show_btn,del_btn,edit_btn))
-    window.__add__(blockTitle)
-    window.__add__(blockData)
-    window.__add__((btnOk, btnCancel))
 
 def delBlock(dataUser):
     with open(fileData, 'r') as file:
