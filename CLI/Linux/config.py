@@ -1,6 +1,9 @@
 CONFIG_MENU = """
 config:
     Window:
+        min_width: 70
+        width: 70
+        height: 13
         styles:
             set_title: '[2]{item}'
             border: '[white]{item}'
@@ -16,6 +19,8 @@ config:
 CONFIG_REGLOGWINDOW = '''
 config:
     Window:
+        min_width: 60
+        width: 60
         styles:
             title: '[2]{item}'
             border: '[white]{item}'

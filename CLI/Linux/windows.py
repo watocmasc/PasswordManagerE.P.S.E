@@ -1,6 +1,7 @@
 import pytermgui as ptg
-import json, config, time
-import entry
+import config, time, json
+  
+attempt = 10
 
 # base of data
 with open('data.json', 'r') as file:
@@ -9,7 +10,6 @@ with open('data.json', 'r') as file:
 
 class windowMenu():
     def __init__(self):
-        self.window_block = windowAddBlock()
 
         self.loader = ptg.YamlLoader()
         self.namespace = self.loader.load(config.CONFIG_MENU)
@@ -18,13 +18,11 @@ class windowMenu():
         if base['datas'] == {}:
             self.status_data.value = "Tip: There is no data, try adding a new data block"    
 
-        # ---- Buttons ----
         self.add_btn = ptg.Button(" Insert ", onclick=self.addBlock)
         self.show_btn = ptg.Button("  Show  ")
         self.del_btn = ptg.Button(" Delete ")
         self.edit_btn = ptg.Button("  Edit  ")
         self.exit_btn = ptg.Button("    Exit    ", onclick=self.on_exit)
-        # ---- Buttons ----
 
         self.menu = (self.add_btn, self.show_btn, self.del_btn, self.edit_btn)
         self.menu_window = ptg.Window(
@@ -42,14 +40,15 @@ class windowMenu():
         self.menu_window.min_width = 70
 
     def on_exit(self, inx):
-        entry.manager.stop()
+        manager.stop()
 
     def addBlock(self, inx):
-        entry.manager.remove(self.menu_window)
-        entry.manager.add(windowAddBlock().block_window)
+        manager.remove(self.menu_window)
+        manager.add(windowAddBlock().block_window)
 
-class windowAddBlock():
+class windowAddBlock(windowMenu):
     def __init__(self):
+
         self.blockTitle = ptg.InputField(prompt="Name for the block: ")
         self.blockData = ptg.InputField(prompt="Data for this block name: ")
         self.btnOk = ptg.Button("Ok", onclick=self.on_ok)
@@ -71,7 +70,6 @@ class windowAddBlock():
         self.block_window.min_width = 70
 
     def on_ok(self, inx):
-
         if self.blockTitle.value == '' or self.blockData.value == '':
             self.caution.value = '[1 bold]The block name or/and block data cannot be empty'
             time.sleep(2)
@@ -81,17 +79,15 @@ class windowAddBlock():
             base['datas'][self.blockTitle.value] = self.blockData.value.split()
             with open('data.json', 'w') as file:
                 json.dump(base, file)
-            entry.manager.remove(self.block_window)
-            entry.manager.add(windowMenu().menu_window)
+            manager.remove(self.block_window)
+            manager.add(windowMenu().menu_window)
 
     def on_cancel(self, inx):
-        
-        self.block_window.close()
-        entry.manager.add(windowMenu().menu_window)
+        manager.remove(self.block_window)
+        manager.add(windowMenu().menu_window)
 
 class windowRegister(windowMenu):
     def __init__(self):
-        self.win_menu = windowMenu()
 
         self.loader = ptg.YamlLoader()
         self.namespace = self.loader.load(config.CONFIG_REGLOGWINDOW)
@@ -112,14 +108,12 @@ class windowRegister(windowMenu):
         self.reg_window.height = 7
 
     def on_ready(self, inx):
-        import entry
-
         if self.input_password.value:
             base['password'] = self.input_password.value.strip()
             with open('data.json', 'w') as file:
                 json.dump(base, file)
-            self.reg_window.close()
-            entry.manager.add(self.win_menu.menu_window)
+            manager.remove(self.reg_window)
+            manager.add(windowMenu().menu_window)
 
         else:
             label = ptg.Label('[1]The password cannot be empty')
@@ -128,9 +122,8 @@ class windowRegister(windowMenu):
             self.reg_window.remove(label)
             self.reg_window.height = 7 
 
-"""class windowLogin():
+class windowLogin(windowMenu):
     def __init__(self):
-        self.win_menu = windowMenu()
 
         self.attempt = 10
         self.loader = ptg.YamlLoader()
@@ -156,15 +149,26 @@ class windowRegister(windowMenu):
         self.log_window.height = 9
 
     def on_sigin(self, inx):
-        from entry import manager
         # password correct
         if self.inputPassword.value.strip() == base['password']:
-            self.log_window.close()
-            manager.add(self.win_menu.menu_window)
+            manager.remove(self.log_window)
+            manager.add(windowMenu().menu_window)
             
         # incorrect password
         else:
             self.attempts.value = "[@red black bold] Incorrect code words! "
             time.sleep(1.5)
             self.attempt -= 1
-            self.attempts.value = f'[8]{self.attempt} Attempts before deletion'"""
+            self.attempts.value = f'[8]{self.attempt} Attempts before deletion'
+
+with ptg.WindowManager() as manager:
+
+    winLogin = windowLogin()
+    winRegistration = windowRegister()
+
+    if base['password'] == '':
+        manager.add(winRegistration.reg_window)
+    else:
+        manager.add(winLogin.log_window)
+
+    
