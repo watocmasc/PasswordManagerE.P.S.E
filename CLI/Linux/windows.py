@@ -1,59 +1,101 @@
 import pytermgui as ptg
 import config, time, json
-  
-attempt = 10
 
+# TODO place for crypto
+######################################################################
 # base of data
 with open('data.json', 'r') as file:
     base = json.load(file)    
 # base of data
+######################################################################
 
 class windowMenu():
     def __init__(self):
 
         self.loader = ptg.YamlLoader()
         self.namespace = self.loader.load(config.CONFIG_MENU)
+
+        # - initialization of window
         self.menu_window = ptg.Window()
 
-        self.status_data = ptg.Label("")
         if base['datas'] == {}:
-            self.status_data.value = "Tip: There is no data, try adding a new data block"    
 
-        self.listOfData = ptg.Container()
-        self.listOfData.height = 10
-        self.listOfData.overflow = ptg.Overflow.SCROLL
+            # - if the data list is empty
+            self.menu_window.__add__("")
+            self.status_data = ptg.Label("Tip: There is no data, try adding a new data block")
+            for i in range(10):
+                if i == 5:
+                    self.menu_window.__add__(self.status_data)
+                self.menu_window.__add__("")
+        else:
+            ######################################################################
+            # display all data from the database
 
-        count = 1
-        for key in base['datas']:
-            self.listOfData.__add__(ptg.Label(f'{count}| {key}: {" ".join(base["datas"][key])}'))
-            count += 1
+            self.listOfData = ptg.Container() # a place to store data
+                # - properties 
+            self.listOfData.height = 10
+            self.listOfData.overflow = ptg.Overflow.SCROLL
 
-        self.add_btn = ptg.Button(" Insert ", onclick=self.addBlock)
+            count = 1 # - start of count
+            for key in base['datas']:
+                
+                self.listOfData.__add__(ptg.Label(f'{count}| {key}: {" ".join(base["datas"][key])}', parent_align=0)) # parent_align -- 1-(Center) 2-(Right) 3-(Left)
+                self.listOfData.__add__(ptg.Label(""))
+                count += 1
+            self.menu_window.__add__(self.listOfData) 
+
+            # display all data from the database
+            ######################################################################
+
+        ######################################################################
+        # Buttons
+
+        self.add_btn = ptg.Button(" Insert ", onclick=self.addBlockData)
         self.show_btn = ptg.Button("  Show  ")
         self.del_btn = ptg.Button(" Delete ")
         self.edit_btn = ptg.Button("  Edit  ")
-        self.exit_btn = ptg.Button("    Exit    ", onclick=self.on_exit)
+        self.exit_btn = ptg.Button("    Exit    ", onclick=self.ExitFromProgram)
+
+        # Buttons
+        ######################################################################
+
+        ######################################################################
+        # Window properties
+
+        # menu _______________________________________________________________
 
         self.menu = (self.add_btn, self.show_btn, self.del_btn, self.edit_btn)
-
-        self.menu_window.__add__(self.listOfData) 
-        self.menu_window.__add__(self.status_data)
+        self.menu_window.__add__("")
         self.menu_window.__add__(self.menu)
         self.menu_window.__add__("")
         self.menu_window.__add__(self.exit_btn)
+
+        # properties _________________________________________________________
 
         self.menu_window.center(0)
         self.menu_window.is_noresize = True 
         self.menu_window.set_title("[bold]Password Manager")
         self.menu_window.width = 70
+        self.menu_window.height = 18
         self.menu_window.min_width = 70
 
-    def on_exit(self, inx):
+        # Window properties
+        ######################################################################
+
+    ######################################################################
+    # Functions
+
+    # - finish the manager's work, exit the program
+    def ExitFromProgram(self, inx):
         manager.stop()
 
-    def addBlock(self, inx):
+    # - add a new data block to the database
+    def addBlockData(self, inx):
         manager.remove(self.menu_window)
         manager.add(windowAddBlock().block_window, animate=True)
+    
+    # Functions
+    ######################################################################
 
 class windowAddBlock(windowMenu):
     def __init__(self):
@@ -121,7 +163,6 @@ class windowRegister(windowMenu):
                 json.dump(base, file)
             manager.remove(self.reg_window)
             manager.add(windowMenu().menu_window, animate=True)
-            manager.on_resize(70, 13)
 
         else:
             label = ptg.Label('[1]The password cannot be empty')
@@ -133,13 +174,13 @@ class windowRegister(windowMenu):
 class windowLogin(windowMenu):
     def __init__(self):
 
-        self.attempt = 10
+        self.attempt_to_log_in = 10
         self.loader = ptg.YamlLoader()
         self.namespace = self.loader.load(config.CONFIG_REGLOGWINDOW)
 
         self.inputPassword = ptg.InputField(prompt="Password: ")
         self.btn_log = ptg.Button("   Login   ", onclick=self.on_sigin)
-        self.attempts = ptg.Label(f'[8]{self.attempt} Attempts before deletion')
+        self.attempts = ptg.Label(f'[8]{self.attempt_to_log_in} Attempts before deletion')
         self.log_window = ptg.Window(
             "",
             self.inputPassword,
@@ -166,8 +207,8 @@ class windowLogin(windowMenu):
         else:
             self.attempts.value = "[@red black bold] Incorrect code words! "
             time.sleep(1.5)
-            self.attempt -= 1
-            self.attempts.value = f'[8]{self.attempt} Attempts before deletion'
+            self.attempt_to_log_in -= 1
+            self.attempts.value = f'[8]{self.attempt_to_log_in} Attempts before deletion'
 
 with ptg.WindowManager() as manager:
 
@@ -175,8 +216,10 @@ with ptg.WindowManager() as manager:
     winRegistration = windowRegister()
 
     if base['password'] == '':
+        # - registration, password does not exist
         manager.add(winRegistration.reg_window, animate=True)
     else:
+        # - login, password exists
         manager.add(winLogin.log_window, animate=True)
 
     
