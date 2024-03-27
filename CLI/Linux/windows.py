@@ -13,10 +13,20 @@ class windowMenu():
 
         self.loader = ptg.YamlLoader()
         self.namespace = self.loader.load(config.CONFIG_MENU)
+        self.menu_window = ptg.Window()
 
         self.status_data = ptg.Label("")
         if base['datas'] == {}:
             self.status_data.value = "Tip: There is no data, try adding a new data block"    
+
+        self.listOfData = ptg.Container()
+        self.listOfData.height = 10
+        self.listOfData.overflow = ptg.Overflow.SCROLL
+
+        count = 1
+        for key in base['datas']:
+            self.listOfData.__add__(ptg.Label(f'{count}| {key}: {" ".join(base["datas"][key])}'))
+            count += 1
 
         self.add_btn = ptg.Button(" Insert ", onclick=self.addBlock)
         self.show_btn = ptg.Button("  Show  ")
@@ -25,18 +35,17 @@ class windowMenu():
         self.exit_btn = ptg.Button("    Exit    ", onclick=self.on_exit)
 
         self.menu = (self.add_btn, self.show_btn, self.del_btn, self.edit_btn)
-        self.menu_window = ptg.Window(
-            "","",
-            self.status_data,
-            "","","","","",
-            self.menu,
-            "", 
-            self.exit_btn
-        )
+
+        self.menu_window.__add__(self.listOfData) 
+        self.menu_window.__add__(self.status_data)
+        self.menu_window.__add__(self.menu)
+        self.menu_window.__add__("")
+        self.menu_window.__add__(self.exit_btn)
+
         self.menu_window.center(0)
+        self.menu_window.is_noresize = True 
         self.menu_window.set_title("[bold]Password Manager")
         self.menu_window.width = 70
-        self.menu_window.height = 13
         self.menu_window.min_width = 70
 
     def on_exit(self, inx):
@@ -44,7 +53,7 @@ class windowMenu():
 
     def addBlock(self, inx):
         manager.remove(self.menu_window)
-        manager.add(windowAddBlock().block_window)
+        manager.add(windowAddBlock().block_window, animate=True)
 
 class windowAddBlock(windowMenu):
     def __init__(self):
@@ -72,19 +81,17 @@ class windowAddBlock(windowMenu):
     def on_ok(self, inx):
         if self.blockTitle.value == '' or self.blockData.value == '':
             self.caution.value = '[1 bold]The block name or/and block data cannot be empty'
-            time.sleep(2)
-            self.caution.value = ''
         else:
             base['datas'][self.blockTitle.value] = []
-            base['datas'][self.blockTitle.value] = self.blockData.value.split()
+            base['datas'][self.blockTitle.value] = self.blockData.value.strip().split()
             with open('data.json', 'w') as file:
                 json.dump(base, file)
             manager.remove(self.block_window)
-            manager.add(windowMenu().menu_window)
+            manager.add(windowMenu().menu_window, animate=True)
 
     def on_cancel(self, inx):
         manager.remove(self.block_window)
-        manager.add(windowMenu().menu_window)
+        manager.add(windowMenu().menu_window, animate=True)
 
 class windowRegister(windowMenu):
     def __init__(self):
@@ -113,7 +120,8 @@ class windowRegister(windowMenu):
             with open('data.json', 'w') as file:
                 json.dump(base, file)
             manager.remove(self.reg_window)
-            manager.add(windowMenu().menu_window)
+            manager.add(windowMenu().menu_window, animate=True)
+            manager.on_resize(70, 13)
 
         else:
             label = ptg.Label('[1]The password cannot be empty')
@@ -167,8 +175,8 @@ with ptg.WindowManager() as manager:
     winRegistration = windowRegister()
 
     if base['password'] == '':
-        manager.add(winRegistration.reg_window)
+        manager.add(winRegistration.reg_window, animate=True)
     else:
-        manager.add(winLogin.log_window)
+        manager.add(winLogin.log_window, animate=True)
 
     
