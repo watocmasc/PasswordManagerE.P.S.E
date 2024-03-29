@@ -1,17 +1,24 @@
 import pytermgui as ptg
-import time, json
+import time, json, crypto_cipher as c_r
 
-# TODO place for crypto
+######################################################################
+# COLORS #
+##########
+
+# green for the OK button - #32ba52 (label) #45ff70 (highlight)
+# red for the CANCEL button - #c23232 (label) #ff4545 (highlight)
+
+######################################################################
+
 ## Base of data ######################################################
 # 
-with open('data.json', 'r') as file:
-    base = json.load(file)    
+base = None
 # 
 ######################################################################
 
 class windowMenu():
     def __init__(self):
-
+        self.key = c_r.load_key()
         # - initialization of window
         self.menu_window = ptg.Window()
 
@@ -96,6 +103,7 @@ class windowMenu():
     # 
     # - finish the manager's work, exit the program
     def ExitFromProgram(self, _):
+        c_r.encrypt('data.json', self.key)
         manager.stop()
 
     # - add a new data block to the database
@@ -239,7 +247,7 @@ class windowEditBlock(windowMenu):
             
         ## Attributes ########################################################
         # 
-        self.NumOfDataToEdit = ptg.InputField(prompt=" The number of data to edit: ")
+        self.NumOfDataToEdit = ptg.InputField(prompt="The number of data to edit: ")
         self.NumOfDataToEdit.set_style('prompt', '[white bold]{item}')
 
         self.btnEdit = ptg.Button("    Edit    ", onclick=self.on_edit)
@@ -267,7 +275,7 @@ class windowEditBlock(windowMenu):
         self.edit_window.__add__((self.btnEdit, self.btnLeave))
         # properties _________________________________________________________
         self.edit_window.center(0)
-        self.edit_window.set_title("[white bold] Editing a data block ")
+        self.edit_window.set_title("[@white black bold] Editing a data block ")
         self.edit_window.width = 70
         self.edit_window.height = 18
         self.edit_window.min_width = 70
@@ -348,7 +356,10 @@ class windowDelBlock(windowMenu):
         ## Display all data from the database ################################
         # 
         self.data_to_delete = ptg.Container() # a place to store data
-        # - properties 
+        self.data_to_delete.set_style('border', '[#dec14e]{item}')
+        self.data_to_delete.set_style('corner', '[#dec14e]{item}')
+        self.data_to_delete.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
+        self.data_to_delete.set_char('border', ['│ ', '─', ' │', '─'])
         self.data_to_delete.height = 10
         self.data_to_delete.overflow = ptg.Overflow.SCROLL
         count = 1 # - start of count
@@ -362,9 +373,20 @@ class windowDelBlock(windowMenu):
         ## Attributes ########################################################
         # 
         self.NumOfDataToDelete = ptg.InputField(prompt="The number of data to delete: ")
+        self.NumOfDataToDelete.set_style('prompt', '[white bold]{item}')
+        self.NumOfDataToDelete.set_style('value', '[white]{item}')
+
         self.btnDelete = ptg.Button("    Delete    ", onclick=self.on_delete)
+        self.btnDelete.set_style('label', '[@#c23232 white]{item}')
+        self.btnDelete.set_style('highlight', '[@#ff4545 white bold]{item}')
+        self.btnDelete.on_release(self.btnDelete)
+
         self.btnLeave = ptg.Button("    Cancel    ", onclick=self.on_leave)
-        self.NameHint = ptg.Label("Write down the data number to delete.",parent_align=1)
+        self.btnLeave.set_style('label', '[@#32ba52 white]{item}')
+        self.btnLeave.set_style('highlight', '[@#45ff70 white bold]{item}')
+        self.btnLeave.on_release(self.btnLeave)
+
+        self.NameHint = ptg.Label("[#90ee90 bold]Write down the data number to delete.",parent_align=1)
         #
         ######################################################################
 
@@ -380,7 +402,7 @@ class windowDelBlock(windowMenu):
         self.del_window.__add__((self.btnDelete, self.btnLeave))
         # properties _________________________________________________________
         self.del_window.center(0)
-        self.del_window.set_title("[bold]Deleting a data block")
+        self.del_window.set_title("[@white black bold] Deleting a data block")
         self.del_window.width = 70
         self.del_window.height = 18
         self.del_window.min_width = 70
@@ -407,11 +429,17 @@ class windowDelBlock(windowMenu):
                     manager.remove(self.del_window)
                     manager.add(windowMenu().menu_window)
                 else:
-                    self.NameHint.value = "Unavailable values for the block number"
+                    self.NameHint.value = "[@1 white bold] Unavailable values for the block number "
+                    time.sleep(1)
+                    self.NameHint.value = "[#90ee90 bold]Write down the data number to delete."
             else:
-                self.NameHint.value = "Unavailable values for the block number"
+                self.NameHint.value = "[@1 white bold] Unavailable values for the block number "
+                time.sleep(1)
+                self.NameHint.value = "[#90ee90 bold]Write down the data number to delete."
         except:
-            self.NameHint.value = "Unavailable values for the block number"
+            self.NameHint.value = "[@1 white bold] Unavailable values for the block number "
+            time.sleep(1)
+            self.NameHint.value = "[#90ee90 bold]Write down the data number to delete."
 
     def on_leave(self, _):
         manager.remove(self.del_window)
@@ -540,10 +568,15 @@ class windowRegister(windowMenu):
     # 
     # - registration - create a password to log in
     def on_ready(self, _):
+        global key
+        with open('data.json', 'r') as file:
+            base = json.load(file) 
         if self.inputPassword.value:
             base['password'] = self.inputPassword.value.strip()
             with open('data.json', 'w') as file:
                 json.dump(base, file)
+            c_r.write_key()
+            key = c_r.load_key()
             manager.remove(self.reg_window)
             manager.add(windowMenu().menu_window)
         else:
@@ -557,6 +590,16 @@ class windowRegister(windowMenu):
 
 class windowLogin(windowMenu):
     def __init__(self):
+        CONFIG_YAML = """
+        config:
+            Window:
+                styles:
+                    border: '[white]{item}'
+                    corner: '[white]{item}'
+        """
+        loader = ptg.YamlLoader()
+        namespace = loader.load(CONFIG_YAML)
+
         self.log_window = ptg.Window()
         ## Attributes ########################################################
         # 
@@ -565,7 +608,7 @@ class windowLogin(windowMenu):
 
         self.inputPassword = ptg.InputField(prompt="Password: ")
         self.inputPassword.set_style("prompt", "[white bold]{item}")
-        self.inputPassword.set_style("value", "[white]{item}")
+        self.inputPassword.set_style("value", "[0]{item}")
 
         self.btn_log = ptg.Button("   Login   ", onclick=self.on_sigin)
         self.btn_log.set_style('label', '[@#32ba52 white]{item}')
@@ -601,12 +644,18 @@ class windowLogin(windowMenu):
     ## Functions #########################################################
     # 
     def on_sigin(self, _):
+        global base
         # password correct
+        key = c_r.load_key()
+        c_r.decrypt('data.json', key)
+        with open('data.json', 'r') as file:
+            base = json.load(file) 
         if self.inputPassword.value.strip() == base['password']:
             manager.remove(self.log_window)
             manager.add(windowMenu().menu_window)    
         # incorrect password
         else:
+            c_r.encrypt('data.json', key)
             self.attempts.value = "[@1 white bold] Incorrect code words! "
             time.sleep(1.5)
             self.attempt_to_log_in -= 1
@@ -620,12 +669,21 @@ with ptg.WindowManager() as manager:
 
     winLogin = windowLogin()
     winRegistration = windowRegister()
-
-    if base['password'] == '':
-        # - registration, password does not exist
-        manager.add(winRegistration.reg_window)
-    else:
-        # - login, password exists
+    try:
+        with open('data.json', 'r') as file:
+            base = json.load(file) 
+    except:
+        pass
+    try:
+        if base['password'] == '':
+            c_r.write_key()
+            key = c_r.load_key()
+            # - registration, password does not exist
+            manager.add(winRegistration.reg_window)
+        else:
+            # - login, password exists
+            manager.add(winLogin.log_window)
+    except:
         manager.add(winLogin.log_window)
 # 
 ######################################################################
