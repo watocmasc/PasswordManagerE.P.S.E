@@ -1,5 +1,6 @@
 import pytermgui as ptg
 import time, json, crypto_cipher as c_r
+from pynput.keyboard import Key, Controller
 
 ######################################################################
 # COLORS #
@@ -71,6 +72,11 @@ class windowMenu():
         self.edit_btn.set_style("highlight", '[@#ff8c45 white bold]{item}')
         self.edit_btn.on_release(self.edit_btn)
 
+        self.passGen_btn = ptg.Button("Password generator", onclick=self.passwordGenerator)
+        self.passGen_btn.set_style("label", '[@#5b32c2 white]{item}')
+        self.passGen_btn.set_style("highlight", '[@#9945ff white bold]{item}')
+        self.passGen_btn.on_release(self.passGen_btn)
+
         self.exit_btn = ptg.Button("        Exit        ", onclick=self.ExitFromProgram)
         self.exit_btn.set_style("label", '[@#c23232 white]{item}')
         self.exit_btn.set_style("highlight", '[@#ff4545 white bold]{item}')
@@ -86,7 +92,7 @@ class windowMenu():
         self.menu_window.__add__("")
         self.menu_window.__add__(self.menu)
         self.menu_window.__add__("")
-        self.menu_window.__add__(self.exit_btn)
+        self.menu_window.__add__((self.exit_btn, self.passGen_btn))
 
         # properties _________________________________________________________
 
@@ -127,6 +133,7 @@ class windowMenu():
             dialogWindow.__add__(reference)
             dialogWindow.__add__("")
             dialogWindow.__add__(btnOk)
+                
             manager.add(dialogWindow)
         # - if the data is available
         else:
@@ -155,8 +162,67 @@ class windowMenu():
         else:
             manager.remove(self.menu_window)
             manager.add(windowDelBlock().del_window)
+    
+    # - generates a password
+    def passwordGenerator(self, _):
+        manager.remove(self.menu_window)
+        manager.add(windowPasswordGenerator().passwordGenerator_window)
     # 
     ######################################################################
+
+class windowPasswordGenerator(windowMenu):
+    def __init__(self):
+        # - initialization of window
+        self.passwordGenerator_window = ptg.Window()
+        self.passwordGenerator_window.center(0)
+        self.passwordGenerator_window.set_title("[@white black bold] Password generator")
+        self.passwordGenerator_window.width = 70
+        self.passwordGenerator_window.height = 4
+        self.passwordGenerator_window.min_width = 70
+
+        ######################################################################
+        # Containers 
+        #
+        self.fieldPasswordLength = ptg.Container()
+        self.fieldPasswordLength.height = 3
+        self.fieldPasswordLength.set_style('border', '[#dec14e]{item}')
+        self.fieldPasswordLength.set_style('corner', '[#dec14e]{item}')
+        self.fieldPasswordLength.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
+        self.fieldPasswordLength.set_char('border', ['│ ', '─', ' │', '─'])
+        self.fieldPasswordLength.overflow = ptg.Overflow.SCROLL
+
+        self.titleFieldNewPassword = ptg.Label("There is no new password.")
+        self.titleFieldNewPassword.set_style("label", "[@white black bold]{item}")
+
+        self.btn_cancel = ptg.Button("Cancel", onclick=self.on_cancel)
+        self.btn_cancel.set_style('label', '[@#c23232 white]{item}')
+        self.btn_cancel.set_style('highlight', '[@#ff4545 white bold]{item}')
+        self.btn_cancel.on_release(self.btn_cancel)
+
+        self.fieldNewPassword = ptg.Container()
+        self.fieldNewPassword.height = 3
+        self.fieldNewPassword.set_style('border', '[#dec14e]{item}')
+        self.fieldNewPassword.set_style('corner', '[#dec14e]{item}')
+        self.fieldNewPassword.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
+        self.fieldNewPassword.set_char('border', ['│ ', '─', ' │', '─'])
+        self.fieldNewPassword.overflow = ptg.Overflow.SCROLL
+        # 
+        ######################################################################
+
+        self.lenghtPassword = ptg.InputField(prompt="Enter the password length: ")
+        self.lenghtPassword.set_style("prompt", "[white bold]{item}")
+        self.lenghtPassword.set_style("value", "[white]{item}")
+
+    def generator(self, _):
+        import random as rm
+        symbols = '1234567890qwertyuiopasdfghjklzxcvbnm,./;\'[]{}- \
+        =_+<>?"!@#$%^&*()\\|QAWSEDRFTGYHUJIKOLPZXCVBNM'
+        new_password = "".join([symbols[rm.randint(0, len(symbols)-1)] for i in range(self.lenghtPassword.value)])
+        self.titleFieldNewPassword.value = new_password
+    
+    def on_cancel(self, _):
+        manager.remove(self.passwordGenerator_window)
+        manager.add(windowMenu().menu_window)
 
 class windowEditBlock(windowMenu):
     def __init__(self):
@@ -289,16 +355,39 @@ class windowEditBlock(windowMenu):
         manager.add(windowMenu().menu_window)    
 
     def on_edit_save(self, _):
-        if self.newTitle.value == "" or self.newData.value == "":
-            self.hint.value = '[@1 white bold] The block name or/and block data cannot be empty '
-            time.sleep(1)
-            self.hint.value = ""
+        if self.newTitle.value == "" and self.newData.value == "":
+            manager.remove(self.editing_specific_data_window)
+            manager.add(windowMenu().menu_window)
+        elif self.newTitle.value and not(self.newData.value):
+            count = 1 # - start of count
+            for key in base['datas']:
+                if self.current_block == count:
+                    data_of_old_key = base['datas'][key]
+                    del base['datas'][key]
+                    base['datas'][self.newTitle.value.strip()] = data_of_old_key
+                    with open('data.json', 'w') as file:
+                        json.dump(base, file)
+                    break
+                count += 1
+            manager.remove(self.editing_specific_data_window)
+            manager.add(windowMenu().menu_window)
+        elif not(self.newTitle.value) and self.newData.value:
+            count = 1 # - start of count
+            for key in base['datas']:
+                if self.current_block == count:
+                    base['datas'][key] = self.newData.value.strip().split()
+                    with open('data.json', 'w') as file:
+                        json.dump(base, file)
+                    break
+                count += 1
+            manager.remove(self.editing_specific_data_window)
+            manager.add(windowMenu().menu_window)
         else:
             count = 1 # - start of count
             for key in base['datas']:
                 if self.current_block == count:
                     del base['datas'][key]
-                    base['datas'][self.newTitle.value] = self.newData.value.split()
+                    base['datas'][self.newTitle.value] = self.newData.value.strip().split()
                     with open('data.json', 'w') as file:
                         json.dump(base, file)
                     break
@@ -460,7 +549,7 @@ class windowAddBlock(windowMenu):
         self.blockTitleContainer.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
         self.blockTitleContainer.set_char('border', ['│ ', '─', ' │', '─'])
         self.blockTitleContainer.overflow = ptg.Overflow.SCROLL
-        self.blockTitle = ptg.InputField(prompt=" Name for the data block: ")
+        self.blockTitle = ptg.InputField(prompt="Name for the data block: ")
         self.blockTitleContainer._add_widget(self.blockTitle)
         self.blockTitle.set_style("prompt", "[white bold]{item}")
         self.blockTitle.set_style("value", "[white]{item}")
@@ -473,7 +562,7 @@ class windowAddBlock(windowMenu):
         self.blockDataContainer.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
         self.blockDataContainer.set_char('border', ['│ ', '─', ' │', '─'])
         self.blockDataContainer.overflow = ptg.Overflow.SCROLL
-        self.blockData = ptg.InputField(prompt=" Data for this block name: ")
+        self.blockData = ptg.InputField(prompt="Data for this block name: ")
         self.blockDataContainer._add_widget(self.blockData)
         self.blockData.set_style("prompt", "[white bold]{item}")
         self.blockData.set_style("value", "[white]{item}")
@@ -568,7 +657,6 @@ class windowRegister(windowMenu):
     # 
     # - registration - create a password to log in
     def on_ready(self, _):
-        global key
         with open('data.json', 'r') as file:
             base = json.load(file) 
         if self.inputPassword.value:
@@ -576,7 +664,6 @@ class windowRegister(windowMenu):
             with open('data.json', 'w') as file:
                 json.dump(base, file)
             c_r.write_key()
-            key = c_r.load_key()
             manager.remove(self.reg_window)
             manager.add(windowMenu().menu_window)
         else:
@@ -606,7 +693,7 @@ class windowLogin(windowMenu):
         self.attempt_to_log_in = 10
         self.title = "[@white black bold] Sign in"
 
-        self.inputPassword = ptg.InputField(prompt="Password: ")
+        self.inputPassword = ptg.InputField(prompt="Password:")
         self.inputPassword.set_style("prompt", "[white bold]{item}")
         self.inputPassword.set_style("value", "[0]{item}")
 
@@ -644,15 +731,15 @@ class windowLogin(windowMenu):
     ## Functions #########################################################
     # 
     def on_sigin(self, _):
-        global base
         # password correct
+        global base
         key = c_r.load_key()
         c_r.decrypt('data.json', key)
         with open('data.json', 'r') as file:
             base = json.load(file) 
         if self.inputPassword.value.strip() == base['password']:
             manager.remove(self.log_window)
-            manager.add(windowMenu().menu_window)    
+            manager.add(windowMenu().menu_window)   
         # incorrect password
         else:
             c_r.encrypt('data.json', key)
@@ -667,23 +754,21 @@ class windowLogin(windowMenu):
 #
 with ptg.WindowManager() as manager:
 
-    winLogin = windowLogin()
-    winRegistration = windowRegister()
     try:
+        # the file will be encrypted
         with open('data.json', 'r') as file:
             base = json.load(file) 
-    except:
-        pass
-    try:
+        # the password will not be read in 
+        #the future as the file will be encrypted 
+        #and will not be able to open
         if base['password'] == '':
             c_r.write_key()
-            key = c_r.load_key()
             # - registration, password does not exist
-            manager.add(winRegistration.reg_window)
+            manager.add(windowRegister().reg_window)
         else:
             # - login, password exists
-            manager.add(winLogin.log_window)
-    except:
-        manager.add(winLogin.log_window)
+            manager.add(windowLogin().log_window)
+    except Exception:
+        manager.add(windowLogin().log_window)
 # 
 ######################################################################
