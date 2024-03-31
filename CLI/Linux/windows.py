@@ -1,6 +1,5 @@
 import pytermgui as ptg
-import time, json, crypto_cipher as c_r
-from pynput.keyboard import Key, Controller
+import time, json, crypto_cipher as c_r, pyperclip
 
 ######################################################################
 # COLORS #
@@ -57,29 +56,29 @@ class windowMenu():
 
         ## Buttons ###########################################################
         # 
-        self.add_btn = ptg.Button(" Insert ", onclick=self.addBlockData)
-        self.add_btn.set_style("label",'[@#32ba52 white]{item}')
-        self.add_btn.set_style("highlight",'[@#45ff70 white bold]{item}')
+        self.add_btn = ptg.Button("Insert", onclick=self.addBlockData)
+        self.add_btn.set_style("label",'[@#32ba52 white]    {item}    ')
+        self.add_btn.set_style("highlight",'[@#45ff70 white bold]    {item}    ')
         self.add_btn.on_release(self.add_btn)
 
-        self.del_btn = ptg.Button(" Delete ", onclick=self.delBlockData)
-        self.del_btn.set_style("label",'[@#ba3232 white]{item}')
-        self.del_btn.set_style("highlight",'[@#ff4545 white bold]{item}')
+        self.del_btn = ptg.Button("Delete", onclick=self.delBlockData)
+        self.del_btn.set_style("label",'[@#ba3232 white]    {item}    ')
+        self.del_btn.set_style("highlight",'[@#ff4545 white bold]    {item}    ')
         self.del_btn.on_release(self.del_btn)
 
-        self.edit_btn = ptg.Button("  Edit  ", onclick=self.editBlockData)
-        self.edit_btn.set_style("label", '[@#c26932 white]{item}')
-        self.edit_btn.set_style("highlight", '[@#ff8c45 white bold]{item}')
+        self.edit_btn = ptg.Button("Edit", onclick=self.editBlockData)
+        self.edit_btn.set_style("label", '[@#c26932 white]     {item}     ')
+        self.edit_btn.set_style("highlight", '[@#ff8c45 white bold]     {item}     ')
         self.edit_btn.on_release(self.edit_btn)
 
         self.passGen_btn = ptg.Button("Password generator", onclick=self.passwordGenerator)
-        self.passGen_btn.set_style("label", '[@#5b32c2 white]{item}')
-        self.passGen_btn.set_style("highlight", '[@#9945ff white bold]{item}')
+        self.passGen_btn.set_style("label", '[@#5b32c2 white] {item} ')
+        self.passGen_btn.set_style("highlight", '[@#9945ff white bold] {item} ')
         self.passGen_btn.on_release(self.passGen_btn)
 
-        self.exit_btn = ptg.Button("        Exit        ", onclick=self.ExitFromProgram)
-        self.exit_btn.set_style("label", '[@#c23232 white]{item}')
-        self.exit_btn.set_style("highlight", '[@#ff4545 white bold]{item}')
+        self.exit_btn = ptg.Button("Exit", onclick=self.ExitFromProgram)
+        self.exit_btn.set_style("label", '[@#c23232 white]        {item}        ')
+        self.exit_btn.set_style("highlight", '[@#ff4545 white bold]        {item}        ')
         self.exit_btn.on_release(self.exit_btn)
         # 
         ######################################################################
@@ -177,12 +176,37 @@ class windowPasswordGenerator(windowMenu):
         self.passwordGenerator_window.center(0)
         self.passwordGenerator_window.set_title("[@white black bold] Password generator")
         self.passwordGenerator_window.width = 70
-        self.passwordGenerator_window.height = 4
+        self.passwordGenerator_window.height = 5
         self.passwordGenerator_window.min_width = 70
 
         ######################################################################
-        # Containers 
+        # Attributes
         #
+        self.titleFieldNewPassword = ptg.Label("The generated password will be here.")
+        self.titleFieldNewPassword.set_style("label", "[@white black bold]{item}")
+
+        self.danger = ptg.Label("")
+        self.danger.set_style("label", "[@white black bold]{item}")
+
+        self.btn_cancel = ptg.Button("Cancel", onclick=self.on_cancel)
+        self.btn_cancel.set_style('label', '[@#c23232 white]     {item}     ')
+        self.btn_cancel.set_style('highlight', '[@#ff4545 white bold]     {item}     ')
+        self.btn_cancel.on_release(self.btn_cancel)
+
+        self.btn_copy = ptg.Button("Copy", onclick=self.on_copy)
+        self.btn_copy.set_style('label', '[@#32c273 white]      {item}      ')
+        self.btn_copy.set_style('highlight', '[@#45ff96 white bold]      {item}      ')
+        self.btn_copy.on_release(self.btn_copy)
+
+        self.btn_generate = ptg.Button("Generate", onclick=self.generator)
+        self.btn_generate.set_style('label', '[@#32ba52 white]    {item}    ')
+        self.btn_generate.set_style('highlight', '[@#45ff70 white bold]    {item}    ')
+        self.btn_generate.on_release(self.btn_generate)
+
+        self.lenghtPassword = ptg.InputField(prompt="Enter the password length: ")
+        self.lenghtPassword.set_style("prompt", "[white bold]{item}")
+        self.lenghtPassword.set_style("value", "[white]{item}")
+
         self.fieldPasswordLength = ptg.Container()
         self.fieldPasswordLength.height = 3
         self.fieldPasswordLength.set_style('border', '[#dec14e]{item}')
@@ -191,14 +215,6 @@ class windowPasswordGenerator(windowMenu):
         self.fieldPasswordLength.set_char('border', ['│ ', '─', ' │', '─'])
         self.fieldPasswordLength.overflow = ptg.Overflow.SCROLL
 
-        self.titleFieldNewPassword = ptg.Label("There is no new password.")
-        self.titleFieldNewPassword.set_style("label", "[@white black bold]{item}")
-
-        self.btn_cancel = ptg.Button("Cancel", onclick=self.on_cancel)
-        self.btn_cancel.set_style('label', '[@#c23232 white]{item}')
-        self.btn_cancel.set_style('highlight', '[@#ff4545 white bold]{item}')
-        self.btn_cancel.on_release(self.btn_cancel)
-
         self.fieldNewPassword = ptg.Container()
         self.fieldNewPassword.height = 3
         self.fieldNewPassword.set_style('border', '[#dec14e]{item}')
@@ -206,23 +222,98 @@ class windowPasswordGenerator(windowMenu):
         self.fieldNewPassword.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
         self.fieldNewPassword.set_char('border', ['│ ', '─', ' │', '─'])
         self.fieldNewPassword.overflow = ptg.Overflow.SCROLL
+
+        self.fieldPasswordLength._add_widget(self.lenghtPassword)
+        self.fieldNewPassword._add_widget(self.titleFieldNewPassword)
+
+        self.letters = ptg.Checkbox(callback=self.callback_letters)
+        self.letters.chars = {"delimiter":["   ", "   "], "checked":"☑","unchecked":"☐"}
+        self.letters.set_style('label', "[@#c23232 white] {item} ")
+        self.letters.set_style('highlight', '[@#ff4545 white] {item} ')
+        self.letters.on_release(self.letters)
+
+        self.symbols1 = ptg.Checkbox(callback=self.callback_symbols1)
+        self.symbols1.chars = {"delimiter":["   ", "   "], "checked":"☑","unchecked":"☐"}
+        self.symbols1.set_style('label', "[@#c23232 white] {item} ")
+        self.symbols1.set_style('highlight', '[@#ff4545 white] {item} ')
+        self.symbols1.on_release(self.symbols1)
+
+        self.symbols2 = ptg.Checkbox(callback=self.callback_symbols2)
+        self.symbols2.chars = {"delimiter":["   ", "   "], "checked":"☑","unchecked":"☐"}
+        self.symbols2.set_style('label', "[@#c23232 white] {item} ")
+        self.symbols2.set_style('highlight', '[@#ff4545 white] {item} ')
+        self.symbols2.on_release(self.symbols2)
         # 
         ######################################################################
 
-        self.lenghtPassword = ptg.InputField(prompt="Enter the password length: ")
-        self.lenghtPassword.set_style("prompt", "[white bold]{item}")
-        self.lenghtPassword.set_style("value", "[white]{item}")
+        self.passwordGenerator_window.__add__(("[white bold] a-z,A-Z ","[white bold] @#*_", "[white bold] +!'? "))
+        self.passwordGenerator_window.__add__((self.letters, self.symbols1, self.symbols2))
+        self.passwordGenerator_window.__add__(self.fieldPasswordLength)
+        self.passwordGenerator_window.__add__(self.fieldNewPassword)
+        self.passwordGenerator_window.__add__(self.danger)
+        self.passwordGenerator_window.__add__((self.btn_copy,self.btn_generate,self.btn_cancel))
+
+    ######################################################################
+    # callbacks
+        
+    def callback_letters(self, _):
+        if self.letters.checked:
+            self.letters.set_style('label', "[@#32ba52 white] {item} ")
+            #32ba52 (label) #45ff70 (highlight)
+            self.letters.set_style('highlight', '[@#45ff70 white] {item} ')
+            self.letters.on_release(self.letters)
+        else:
+            self.letters.set_style('label', "[@#c23232 white] {item} ")
+            self.letters.set_style('highlight', '[@#ff4545 white] {item} ')
+            self.letters.on_release(self.letters)
+
+    def callback_symbols1(self, _):
+        if self.symbols1.checked:
+            self.symbols1.set_style('label', "[@#32ba52 white] {item} ")
+            self.symbols1.set_style('highlight', '[@#45ff70 white] {item} ')
+            self.symbols1.on_release(self.symbols1)
+        else:
+            self.symbols1.set_style('label', "[@#c23232 white] {item} ")
+            self.symbols1.set_style('highlight', '[@#ff4545 white] {item} ')
+            self.symbols1.on_release(self.symbols1)
+
+    def callback_symbols2(self, _):
+        if self.symbols2.checked:
+            self.symbols2.set_style('label', "[@#32ba52 white] {item} ")
+            self.symbols2.set_style('highlight', '[@#45ff70 white] {item} ')
+            self.symbols2.on_release(self.symbols2)
+        else:
+            self.symbols2.set_style('label', "[@#c23232 white] {item} ")
+            self.symbols2.set_style('highlight', '[@#ff4545 white] {item} ')
+            self.symbols2.on_release(self.symbols2)
+    #
+    ######################################################################
+
+    ## Functions #########################################################
+    # 
 
     def generator(self, _):
         import random as rm
-        symbols = '1234567890qwertyuiopasdfghjklzxcvbnm,./;\'[]{}- \
-        =_+<>?"!@#$%^&*()\\|QAWSEDRFTGYHUJIKOLPZXCVBNM'
-        new_password = "".join([symbols[rm.randint(0, len(symbols)-1)] for i in range(self.lenghtPassword.value)])
-        self.titleFieldNewPassword.value = new_password
+        symbols = '''1234567890qwertyuiopasdfghjklzxcvbnm,./;\'[]{}-=_+<>?"!@#$%^&*()\\|QAWSEDRFTGYHUJIKOLPZXCVBNM'''
+        try:
+            new_password = "".join([symbols[rm.randint(0, len(symbols)-1)] for i in range(int(self.lenghtPassword.value.strip()))])
+            self.titleFieldNewPassword.value = new_password
+        except ValueError:
+            self.danger.value = "[@1 white bold]Invalid value for password size\n"
+            time.sleep(1)
+            self.danger.value = ""
     
+    def on_copy(self, _):
+        try:
+            pyperclip.copy(self.titleFieldNewPassword.value)
+        except Exception:
+            pass # TODO fix the implementation of the copy mechanism
+
     def on_cancel(self, _):
         manager.remove(self.passwordGenerator_window)
         manager.add(windowMenu().menu_window)
+    # 
+    ######################################################################
 
 class windowEditBlock(windowMenu):
     def __init__(self):
@@ -734,7 +825,10 @@ class windowLogin(windowMenu):
         # password correct
         global base
         key = c_r.load_key()
-        c_r.decrypt('data.json', key)
+        try:
+            c_r.decrypt('data.json', key)
+        except Exception:
+            pass
         with open('data.json', 'r') as file:
             base = json.load(file) 
         if self.inputPassword.value.strip() == base['password']:
