@@ -182,6 +182,8 @@ class windowPasswordGenerator(windowMenu):
         ######################################################################
         # Attributes
         #
+        self.symbols = ''
+
         self.titleFieldNewPassword = ptg.Label("The generated password will be here.")
         self.titleFieldNewPassword.set_style("label", "[@white black bold]{item}")
 
@@ -246,7 +248,7 @@ class windowPasswordGenerator(windowMenu):
         # 
         ######################################################################
 
-        self.passwordGenerator_window.__add__(("[white bold] a-z,A-Z ","[white bold] @#*_", "[white bold] +!'? "))
+        self.passwordGenerator_window.__add__(("[white bold]a-z,A-Z,0-9","[white bold]@#*_", "[white bold]+!'?"))
         self.passwordGenerator_window.__add__((self.letters, self.symbols1, self.symbols2))
         self.passwordGenerator_window.__add__(self.fieldPasswordLength)
         self.passwordGenerator_window.__add__(self.fieldNewPassword)
@@ -258,31 +260,37 @@ class windowPasswordGenerator(windowMenu):
         
     def callback_letters(self, _):
         if self.letters.checked:
+            self.symbols += '1234567890qwertyuiopasdfghjklzxcvbnmQAWSEDRFTGYHUJIKOLPZXCVBNM'
             self.letters.set_style('label', "[@#32ba52 white] {item} ")
             #32ba52 (label) #45ff70 (highlight)
             self.letters.set_style('highlight', '[@#45ff70 white] {item} ')
             self.letters.on_release(self.letters)
         else:
+            self.symbols = self.symbols.replace('1234567890qwertyuiopasdfghjklzxcvbnmQAWSEDRFTGYHUJIKOLPZXCVBNM', "")
             self.letters.set_style('label', "[@#c23232 white] {item} ")
             self.letters.set_style('highlight', '[@#ff4545 white] {item} ')
             self.letters.on_release(self.letters)
 
     def callback_symbols1(self, _):
         if self.symbols1.checked:
+            self.symbols += "*@#_.&%$-"
             self.symbols1.set_style('label', "[@#32ba52 white] {item} ")
             self.symbols1.set_style('highlight', '[@#45ff70 white] {item} ')
             self.symbols1.on_release(self.symbols1)
         else:
+            self.symbols = self.symbols.replace("*@#_.&%$-", '')
             self.symbols1.set_style('label', "[@#c23232 white] {item} ")
             self.symbols1.set_style('highlight', '[@#ff4545 white] {item} ')
             self.symbols1.on_release(self.symbols1)
 
     def callback_symbols2(self, _):
         if self.symbols2.checked:
+            self.symbols += "^()=+[]{}\\|/?,><';:\""
             self.symbols2.set_style('label', "[@#32ba52 white] {item} ")
             self.symbols2.set_style('highlight', '[@#45ff70 white] {item} ')
             self.symbols2.on_release(self.symbols2)
         else:
+            self.symbols = self.symbols.replace("^()=+[]{}\\|/?,><';:\"", "")
             self.symbols2.set_style('label', "[@#c23232 white] {item} ")
             self.symbols2.set_style('highlight', '[@#ff4545 white] {item} ')
             self.symbols2.on_release(self.symbols2)
@@ -294,10 +302,10 @@ class windowPasswordGenerator(windowMenu):
 
     def generator(self, _):
         import random as rm
-        symbols = '''1234567890qwertyuiopasdfghjklzxcvbnm,./;\'[]{}-=_+<>?"!@#$%^&*()\\|QAWSEDRFTGYHUJIKOLPZXCVBNM'''
         try:
-            new_password = "".join([symbols[rm.randint(0, len(symbols)-1)] for i in range(int(self.lenghtPassword.value.strip()))])
-            self.titleFieldNewPassword.value = new_password
+            if self.symbols:
+                new_password = "".join([self.symbols[rm.randint(0, len(self.symbols)-1)] for i in range(int(self.lenghtPassword.value.strip()))])
+                self.titleFieldNewPassword.value = new_password
         except ValueError:
             self.danger.value = "[@1 white bold]Invalid value for password size\n"
             time.sleep(1)
