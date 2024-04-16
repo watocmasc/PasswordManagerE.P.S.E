@@ -76,6 +76,11 @@ class windowMenu():
         self.passGen_btn.set_style("highlight", '[@#9945ff white bold] {item} ')
         self.passGen_btn.on_release(self.passGen_btn)
 
+        self.changePass_btn = ptg.Button("Change password", onclick=self.changePassword)
+        self.changePass_btn.set_style("label", '[@black white]  {item}  ')
+        self.changePass_btn.set_style("highlight", '[@#292929 white bold]  {item}  ')
+        self.changePass_btn.on_release(self.changePass_btn)
+
         self.exit_btn = ptg.Button("Exit", onclick=self.ExitFromProgram)
         self.exit_btn.set_style("label", '[@#c23232 white]        {item}        ')
         self.exit_btn.set_style("highlight", '[@#ff4545 white bold]        {item}        ')
@@ -91,7 +96,9 @@ class windowMenu():
         self.menu_window.__add__("")
         self.menu_window.__add__(self.menu)
         self.menu_window.__add__("")
-        self.menu_window.__add__((self.exit_btn, self.passGen_btn))
+        self.menu_window.__add__((self.changePass_btn, self.passGen_btn))
+        self.menu_window.__add__("")
+        self.menu_window.__add__(self.exit_btn)
 
         # properties _________________________________________________________
 
@@ -99,7 +106,7 @@ class windowMenu():
         self.menu_window.is_dirty = True
         self.menu_window.set_title(self.title)
         self.menu_window.width = 70
-        self.menu_window.height = 18
+        self.menu_window.height = 19
         self.menu_window.min_width = 70
         # 
         ######################################################################
@@ -127,7 +134,10 @@ class windowMenu():
             dialogWindow.center(0)
 
             btnOk = ptg.Button("    OK    ", onclick=btnOk)
-            reference = ptg.Label("There is no data to delete.")
+            btnOk.set_style("label","[@black white bold]{item}")
+            btnOk.set_style("highlight","[@white black bold]{item}")
+            btnOk.on_release(btnOk)
+            reference = ptg.Label("[@0 white bold]There is no data to delete.")
 
             dialogWindow.__add__(reference)
             dialogWindow.__add__("")
@@ -150,7 +160,10 @@ class windowMenu():
             dialogWindow.center(0)
 
             btnOk = ptg.Button("    OK    ", onclick=btnOk)
-            reference = ptg.Label("There is no data to delete.")
+            btnOk.set_style("label","[@black white bold]{item}")
+            btnOk.set_style("highlight","[@white black bold]{item}")
+            btnOk.on_release(btnOk)
+            reference = ptg.Label("[@0 white bold]There is no data to delete.")
 
             dialogWindow.__add__(reference)
             dialogWindow.__add__("")
@@ -166,8 +179,91 @@ class windowMenu():
     def passwordGenerator(self, _):
         manager.remove(self.menu_window)
         manager.add(windowPasswordGenerator().passwordGenerator_window)
+
+    def changePassword(self, _):
+        manager.add(windowChangePassword().changePassword_window)
     # 
     ######################################################################
+
+class windowChangePassword(windowMenu):
+    def __init__(self):
+        # - initialization of window
+        self.changePassword_window = ptg.Window()
+        self.changePassword_window.center(0)
+        self.changePassword_window.set_title("[@white black bold] Changing the password")
+        self.changePassword_window.width = 70
+        self.changePassword_window.height = 5
+        self.changePassword_window.min_width = 70
+
+        ######################################################################
+        # Attributes
+        #
+        self.btn_cancel = ptg.Button("Cancel", onclick=self.on_cancel)
+        self.btn_cancel.set_style('label', '[@#c23232 white]     {item}     ')
+        self.btn_cancel.set_style('highlight', '[@#ff4545 white bold]     {item}     ')
+        self.btn_cancel.on_release(self.btn_cancel)
+
+        self.btn_save = ptg.Button("Save", onclick=self.on_save)
+        self.btn_save.set_style('label', '[@#c29e32 white]      {item}      ')
+        self.btn_save.set_style('highlight', '[@#ffcf40 white bold]      {item}      ')
+        self.btn_save.on_release(self.btn_save)
+
+        self.danger = ptg.Label("")
+        self.danger.set_style("label", "[@white black bold]{item}")
+
+        self.oldPassword = ptg.InputField(prompt="Old password: ")
+        self.oldPassword.set_style("prompt", "[white bold]{item}")
+        self.oldPassword.set_style("value", "[white]{item}")
+
+        self.newPassword = ptg.InputField(prompt="New password: ")
+        self.newPassword.set_style("prompt", "[white bold]{item}")
+        self.newPassword.set_style("value", "[white]{item}")
+
+        self.fieldNewPassword = ptg.Container()
+        self.fieldNewPassword.height = 3
+        self.fieldNewPassword.set_style('border', '[#dec14e]{item}')
+        self.fieldNewPassword.set_style('corner', '[#dec14e]{item}')
+        self.fieldNewPassword.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
+        self.fieldNewPassword.set_char('border', ['│ ', '─', ' │', '─'])
+        self.fieldNewPassword.overflow = ptg.Overflow.SCROLL
+
+        self.fieldOldPassword = ptg.Container()
+        self.fieldOldPassword.height = 3
+        self.fieldOldPassword.set_style('border', '[#dec14e]{item}')
+        self.fieldOldPassword.set_style('corner', '[#dec14e]{item}')
+        self.fieldOldPassword.set_char("corner", ['╭─','─╮', '─╯', '╰─'])
+        self.fieldOldPassword.set_char('border', ['│ ', '─', ' │', '─'])
+        self.fieldOldPassword.overflow = ptg.Overflow.SCROLL
+
+        self.fieldOldPassword._add_widget(self.oldPassword)
+        self.fieldNewPassword._add_widget(self.newPassword)
+
+        self.changePassword_window.__add__(self.fieldOldPassword)
+        self.changePassword_window.__add__(self.fieldNewPassword)
+        self.changePassword_window.__add__(self.danger)
+        self.changePassword_window.__add__("")
+        self.changePassword_window.__add__((self.btn_save, self.btn_cancel))
+
+    def on_cancel(self, _):
+        manager.remove(self.changePassword_window)
+
+    def on_save(self, _):
+        if self.oldPassword.value and self.newPassword.value:
+            if base['password'] == self.oldPassword.value:
+                base['password'] = self.newPassword.value
+                with open('data.json', 'w') as file:
+                        json.dump(base, file)
+                manager.remove(self.changePassword_window)
+            else:
+                # old password incorrect
+                self.danger.value = "Invalid password and/or field(s) are empty\n"
+                time.sleep(1)
+                self.danger.value = ""
+        else:
+            # field == void
+            self.danger.value = "Invalid password and/or field(s) are empty\n"
+            time.sleep(1)
+            self.danger.value = ""
 
 class windowPasswordGenerator(windowMenu):
     def __init__(self):
@@ -315,7 +411,7 @@ class windowPasswordGenerator(windowMenu):
         try:
             pyperclip.copy(self.titleFieldNewPassword.value)
         except Exception:
-            pass # TODO fix the implementation of the copy mechanism
+            pass
 
     def on_cancel(self, _):
         manager.remove(self.passwordGenerator_window)
