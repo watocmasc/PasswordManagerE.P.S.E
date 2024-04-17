@@ -1,12 +1,24 @@
 from cryptography.fernet import Fernet
+import os
 
 def write_key():
     key = Fernet.generate_key()
-    with open('crypto.key', 'wb') as key_file:
+    home_dir = os.path.expanduser('~')
+    try:
+        os.mkdir(f"{home_dir}/.config")
+    except FileExistsError:
+        pass
+    with open(f"{home_dir}/.config/crypto.key", 'wb') as key_file:
         key_file.write(key)
 
 def load_key():
-    return open('crypto.key', 'rb').read()
+    key = Fernet.generate_key()
+    home_dir = os.path.expanduser('~')
+    try:
+        os.mkdir(f"{home_dir}/.config")
+    except FileExistsError:
+        pass
+    return open(f"{home_dir}/.config/crypto.key", 'rb').read()
 
 def encrypt(filename, key):
     f = Fernet(key)

@@ -1,5 +1,6 @@
 import pytermgui as ptg
-import time, json, crypto_cipher as c_r, pyperclip
+import time, json, pyperclip, os   
+import crypto_cipher as c_r
 
 ######################################################################
 # COLORS #
@@ -951,10 +952,21 @@ class windowLogin(windowMenu):
 ## Start window ######################################################
 #
 with ptg.WindowManager() as manager:
-
+    home_dir = os.path.expanduser('~')
+    try:
+        os.mkdir(f"{home_dir}/.config")
+    except FileExistsError:
+        pass  
+    try:
+        with open(f'{home_dir}/.config/data.json', 'r') as file:
+            base = json.load(file) 
+    except FileNotFoundError:
+        creating_data = {"datas":{}, "password":""}
+        with open(f"{home_dir}/.config/data.json", "w") as file:
+            json.dump(creating_data, file)
     try:
         # the file will be encrypted
-        with open('data.json', 'r') as file:
+        with open(f'{home_dir}/.config/data.json', 'r') as file:
             base = json.load(file) 
         # the password will not be read in 
         #the future as the file will be encrypted 
