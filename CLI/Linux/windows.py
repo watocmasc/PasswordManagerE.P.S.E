@@ -19,7 +19,6 @@ base = None
 
 class windowMenu():
     def __init__(self):
-        self.key = c_r.load_key()
         # - initialization of window
         self.menu_window = ptg.Window()
 
@@ -107,7 +106,7 @@ class windowMenu():
         self.menu_window.is_dirty = True
         self.menu_window.set_title(self.title)
         self.menu_window.width = 70
-        self.menu_window.height = 19
+        self.menu_window.height = 20
         self.menu_window.min_width = 70
         # 
         ######################################################################
@@ -117,7 +116,7 @@ class windowMenu():
     # - finish the manager's work, exit the program
     def ExitFromProgram(self, _):
         home_dir = os.path.expanduser('~')
-        c_r.encrypt(f'{home_dir}/.config/data.json', self.key)
+        c_r.encrypt(f'{home_dir}/.config/data.json', c_r.load_key())
         manager.stop()
 
     # - add a new data block to the database
@@ -250,6 +249,7 @@ class windowChangePassword(windowMenu):
         manager.remove(self.changePassword_window)
 
     def on_save(self, _):
+        global base
         if self.oldPassword.value and self.newPassword.value:
             if base['password'] == self.oldPassword.value:
                 base['password'] = self.newPassword.value
@@ -553,6 +553,7 @@ class windowEditBlock(windowMenu):
         manager.add(windowMenu().menu_window)    
 
     def on_edit_save(self, _):
+        global base
         home_dir = os.path.expanduser('~')
         if self.newTitle.value == "" and self.newData.value == "":
             manager.remove(self.editing_specific_data_window)
@@ -700,6 +701,7 @@ class windowDelBlock(windowMenu):
     ## Functions #########################################################
     # 
     def on_delete(self, _):
+        global base
         home_dir = os.path.expanduser('~')
         try:
             if self.NumOfDataToDelete.value:
@@ -801,6 +803,7 @@ class windowAddBlock(windowMenu):
     ## Functions #########################################################
     # 
     def on_ok(self, _):
+        global base
         home_dir = os.path.expanduser('~')
         if self.blockTitle.value == '' or self.blockData.value == '':
             self.caution.value = '[@1 white bold] The block name or/and block data cannot be empty '
@@ -858,6 +861,7 @@ class windowRegister(windowMenu):
     # 
     # - registration - create a password to log in
     def on_ready(self, _):
+        global base
         home_dir = os.path.expanduser('~')
         with open(f'{home_dir}/.config/data.json', 'r') as file:
             base = json.load(file) 
@@ -866,7 +870,6 @@ class windowRegister(windowMenu):
             home_dir = os.path.expanduser('~')
             with open(f'{home_dir}/.config/data.json', 'w') as file:
                 json.dump(base, file)
-            c_r.write_key()
             manager.remove(self.reg_window)
             manager.add(windowMenu().menu_window)
         else:
@@ -965,28 +968,26 @@ with ptg.WindowManager() as manager:
         os.mkdir(f"{home_dir}/.config")
     except Exception:
         pass  
-    try:
-        with open(f'{home_dir}/.config/data.json', 'r') as file:
-            base = json.load(file) 
-    except Exception:
+    if not(os.path.exists(f'{home_dir}/.config/data.json')):
         creating_data = {"datas":{}, "password":""}
         with open(f"{home_dir}/.config/data.json", "w") as file:
             json.dump(creating_data, file)
     try:
-        # the file will be encrypted
-        with open(f'{home_dir}/.config/data.json', 'r') as file:
-            base = json.load(file) 
-        # the password will not be read in 
-        #the future as the file will be encrypted 
-        #and will not be able to open
-        if base['password'] == '':
-            c_r.write_key()
-            # - registration, password does not exist
-            manager.add(windowRegister().reg_window)
-        else:
-            # - login, password exists
-            manager.add(windowLogin().log_window)
+        c_r.decrypt(f'{home_dir}/.config/data.json', c_r.load_key())
     except Exception:
+        pass
+        # the file will be encrypted
+    with open(f'{home_dir}/.config/data.json', 'r') as file:
+        base = json.load(file) 
+    # the password will not be read in 
+    #the future as the file will be encrypted 
+        #and will not be able to open
+    if base['password'] == '':
+        c_r.write_key()
+            # - registration, password does not exist
+        manager.add(windowRegister().reg_window)
+    else:
+            # - login, password exists
         manager.add(windowLogin().log_window)
 # 
 ######################################################################

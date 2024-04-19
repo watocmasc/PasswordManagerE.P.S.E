@@ -12,7 +12,6 @@ def write_key():
         key_file.write(key)
 
 def load_key():
-    key = Fernet.generate_key()
     home_dir = os.path.expanduser('~')
     try:
         os.mkdir(f"{home_dir}/.config")
