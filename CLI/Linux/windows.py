@@ -116,7 +116,8 @@ class windowMenu():
     # 
     # - finish the manager's work, exit the program
     def ExitFromProgram(self, _):
-        c_r.encrypt('data.json', self.key)
+        home_dir = os.path.expanduser('~')
+        c_r.encrypt(f'{home_dir}/.config/data.json', self.key)
         manager.stop()
 
     # - add a new data block to the database
@@ -252,7 +253,8 @@ class windowChangePassword(windowMenu):
         if self.oldPassword.value and self.newPassword.value:
             if base['password'] == self.oldPassword.value:
                 base['password'] = self.newPassword.value
-                with open('data.json', 'w') as file:
+                home_dir = os.path.expanduser('~')
+                with open(f'{home_dir}/.config/data.json', 'w') as file:
                         json.dump(base, file)
                 manager.remove(self.changePassword_window)
             else:
@@ -551,6 +553,7 @@ class windowEditBlock(windowMenu):
         manager.add(windowMenu().menu_window)    
 
     def on_edit_save(self, _):
+        home_dir = os.path.expanduser('~')
         if self.newTitle.value == "" and self.newData.value == "":
             manager.remove(self.editing_specific_data_window)
             manager.add(windowMenu().menu_window)
@@ -561,7 +564,7 @@ class windowEditBlock(windowMenu):
                     data_of_old_key = base['datas'][key]
                     del base['datas'][key]
                     base['datas'][self.newTitle.value.strip()] = data_of_old_key
-                    with open('data.json', 'w') as file:
+                    with open(f'{home_dir}/.config/data.json', 'w') as file:
                         json.dump(base, file)
                     break
                 count += 1
@@ -572,7 +575,7 @@ class windowEditBlock(windowMenu):
             for key in base['datas']:
                 if self.current_block == count:
                     base['datas'][key] = self.newData.value.strip().split()
-                    with open('data.json', 'w') as file:
+                    with open(f'{home_dir}/.config/data.json', 'w') as file:
                         json.dump(base, file)
                     break
                 count += 1
@@ -584,7 +587,7 @@ class windowEditBlock(windowMenu):
                 if self.current_block == count:
                     del base['datas'][key]
                     base['datas'][self.newTitle.value] = self.newData.value.strip().split()
-                    with open('data.json', 'w') as file:
+                    with open(f'{home_dir}/.config/data.json', 'w') as file:
                         json.dump(base, file)
                     break
                 count += 1
@@ -697,6 +700,7 @@ class windowDelBlock(windowMenu):
     ## Functions #########################################################
     # 
     def on_delete(self, _):
+        home_dir = os.path.expanduser('~')
         try:
             if self.NumOfDataToDelete.value:
                 count = 1 # - start of count
@@ -709,7 +713,7 @@ class windowDelBlock(windowMenu):
                     count += 1
                 if blockStatus:
                     self.del_window.__add__(self.data_to_delete) 
-                    with open('data.json', 'w') as file:
+                    with open(f'{home_dir}/.config/data.json', 'w') as file:
                         json.dump(base, file)
                     manager.remove(self.del_window)
                     manager.add(windowMenu().menu_window)
@@ -797,6 +801,7 @@ class windowAddBlock(windowMenu):
     ## Functions #########################################################
     # 
     def on_ok(self, _):
+        home_dir = os.path.expanduser('~')
         if self.blockTitle.value == '' or self.blockData.value == '':
             self.caution.value = '[@1 white bold] The block name or/and block data cannot be empty '
             time.sleep(1)
@@ -804,7 +809,7 @@ class windowAddBlock(windowMenu):
         else:
             base['datas'][self.blockTitle.value] = []
             base['datas'][self.blockTitle.value] = self.blockData.value.strip().split()
-            with open('data.json', 'w') as file:
+            with open(f'{home_dir}/.config/data.json', 'w') as file:
                 json.dump(base, file)
             manager.remove(self.block_window)
             manager.add(windowMenu().menu_window)
@@ -853,11 +858,13 @@ class windowRegister(windowMenu):
     # 
     # - registration - create a password to log in
     def on_ready(self, _):
-        with open('data.json', 'r') as file:
+        home_dir = os.path.expanduser('~')
+        with open(f'{home_dir}/.config/data.json', 'r') as file:
             base = json.load(file) 
         if self.inputPassword.value:
             base['password'] = self.inputPassword.value.strip()
-            with open('data.json', 'w') as file:
+            home_dir = os.path.expanduser('~')
+            with open(f'{home_dir}/.config/data.json', 'w') as file:
                 json.dump(base, file)
             c_r.write_key()
             manager.remove(self.reg_window)
@@ -929,19 +936,20 @@ class windowLogin(windowMenu):
     def on_sigin(self, _):
         # password correct
         global base
+        home_dir = os.path.expanduser('~')
         key = c_r.load_key()
         try:
-            c_r.decrypt('data.json', key)
+            c_r.decrypt(f'{home_dir}/.config/data.json', key)
         except Exception:
             pass
-        with open('data.json', 'r') as file:
+        with open(f'{home_dir}/.config/data.json', 'r') as file:
             base = json.load(file) 
         if self.inputPassword.value.strip() == base['password']:
             manager.remove(self.log_window)
             manager.add(windowMenu().menu_window)   
         # incorrect password
         else:
-            c_r.encrypt('data.json', key)
+            c_r.encrypt(f'{home_dir}/.config/data.json', key)
             self.attempts.value = "[@1 white bold] Incorrect code words! "
             time.sleep(1.5)
             self.attempt_to_log_in -= 1
@@ -955,12 +963,12 @@ with ptg.WindowManager() as manager:
     home_dir = os.path.expanduser('~')
     try:
         os.mkdir(f"{home_dir}/.config")
-    except FileExistsError:
+    except Exception:
         pass  
     try:
         with open(f'{home_dir}/.config/data.json', 'r') as file:
             base = json.load(file) 
-    except FileNotFoundError:
+    except Exception:
         creating_data = {"datas":{}, "password":""}
         with open(f"{home_dir}/.config/data.json", "w") as file:
             json.dump(creating_data, file)
