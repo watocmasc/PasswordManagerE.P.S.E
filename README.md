@@ -29,7 +29,7 @@ If you press the keyboard shortcut **"CTRL + C"**, if you entered the program be
 `nuitka --follow-imports windows.py`
 or your other compiler
 
-### Using a ready-made program
+## Using a ready-made program
 Remove the **"epse"** binary file from the **CLI/Linux/bin** directory and move it to the **/usr/bin/** directory or the directory for binary files of your system.
 
 ### Screenshot
