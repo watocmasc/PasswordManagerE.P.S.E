@@ -3,4 +3,4 @@
 > More than a password manager
 
 ## Linux CLI
-<img src="window_screen.png">
+<img src="epse_cli.jpg">
