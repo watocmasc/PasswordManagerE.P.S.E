@@ -2,8 +2,8 @@
 ### ***Encryption-Protection-Storage-Exchange***
 > More than a password manager
 
-## Linux CLI
-### Description
+# Linux CLI
+### **Description**
 * To work, you need to register by creating a password for further login
 * In the program, everything is divided into blocks, a block has a name and data, each data has a name
 * The name and/or data can be any
@@ -18,4 +18,16 @@ If you press the keyboard shortcut **"CTRL + C"**, if you entered the program be
 
 **_P.s. I will fix this in the future._** :-)
 
+## Build
+### Dependencies
+* `pip install pytermgui`
+* `pip install pyperclip`
+* `pip install cryptography`
+* `pip install nuitka`
+
+### Compilation
+`nuitka --follow-imports windows.py`
+or your other compiler
+
+### Screenshot
 <img src="epse_cli.png">
