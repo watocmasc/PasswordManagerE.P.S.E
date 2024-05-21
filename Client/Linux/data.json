@@ -1,4 +1,6 @@
 {
-    "datas": {},
-    "password": ""
+    "datas": {
+        "google":["email", "12345"],
+        "apple":["email", "12345"]
+    }
 }
