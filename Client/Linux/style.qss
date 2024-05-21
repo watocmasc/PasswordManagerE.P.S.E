@@ -1,0 +1,120 @@
+QWidget {
+    background: black;
+}
+
+QDialog {
+    background: black;
+    border-radius: 15px;
+}
+
+QListWidget {
+    color: white;
+    background-color: #282828;
+    border-radius: 15px;
+    font: 15px "Bahnschrift", sans-serif;
+}
+
+QListWidget::item {
+    height: 50px;
+    color: white;
+    border-color: #282828;
+}
+
+QListWidget::item:selected {
+    background-color: #6b6b6b;
+    border-radius: 15px;
+    color: black;
+}
+
+QLabel {
+    background-color: #FFFFFF;
+    qproperty-alignment: AlignCenter;
+}
+
+QLineEdit#place_title {
+    background-color: #282828;
+    color: white;
+    font-size: 15px;
+}
+
+QLineEdit#place_login {
+    background-color: #282828;
+    color: white;
+    font-size: 15px;
+}
+
+QLineEdit#place_password {
+    background-color: #282828;
+    color: white;
+    font-size: 15px;
+}
+
+QPushButton#btn_addBlock {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_addBlock::hover {
+    background: #57d138;
+    color: #214f15;
+    font: bold 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_delBlock {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_delBlock::hover {
+    background: #d13838;
+    color: #4f1515;
+    font: bold 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_Exit {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_Exit::hover {
+    background: #d13838;
+    color: #4f1515;
+    font: bold 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_done {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_done::hover {
+    background: #57d138;
+    color: #214f15;
+    font: bold 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_cancel {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_cancel::hover {
+    background: #d13838;
+    color: #4f1515;
+    font: bold 15px;
+    border-radius: 15px;
+}
