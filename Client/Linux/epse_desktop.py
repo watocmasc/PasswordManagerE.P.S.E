@@ -2,6 +2,38 @@ import sys, json
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
+class ContentBlock(QWidget):
+    def __init__(self, item):
+        super().__init__()
+        self.item = item
+    
+        # Propertions of main window
+        self.setMinimumHeight(200)
+        self.setMinimumWidth(300)
+
+        self.all_info = QListWidget()
+        for item in self.item:
+            self.all_info.addItem(f' {item}')
+        #self.all_info.itemDoubleClicked.connect(self.full_review_of_block)
+
+        self.btn_ok = QPushButton("Ok")
+        self.btn_ok.setMaximumWidth(80)
+        self.btn_ok.setMinimumWidth(80)
+        self.btn_ok.setMaximumHeight(50)
+        self.btn_ok.setMinimumHeight(50)
+        self.btn_ok.clicked.connect(self.close_window)
+        self.btn_ok.setObjectName('btn_done')
+
+        self.label_place = QVBoxLayout()
+        self.label_place.setAlignment(Qt.AlignVCenter)
+        self.label_place.addWidget(self.all_info)
+        self.label_place.addWidget(self.btn_ok)
+
+        self.setLayout(self.label_place)
+
+    def close_window(self):
+        return self.close()
+
 class CreateBlock(QDialog):
     def __init__(self, parent=None):
         super().__init__()
@@ -14,9 +46,6 @@ class CreateBlock(QDialog):
 
         self.place_login = QLineEdit()
         self.place_login.setObjectName('place_login')
-        
-        self.place_password = QLineEdit()
-        self.place_password.setObjectName('place_password')
         
         self.btn_cancel = QPushButton("Cancel")
         self.btn_cancel.setMaximumWidth(80)
@@ -37,7 +66,6 @@ class CreateBlock(QDialog):
         self.place_titleLogPass = QVBoxLayout()
         self.place_titleLogPass.addWidget(self.place_title)
         self.place_titleLogPass.addWidget(self.place_login)
-        self.place_titleLogPass.addWidget(self.place_password)
 
         self.place_menuOfBtns = QHBoxLayout()
         self.place_menuOfBtns.addWidget(self.btn_done)
@@ -63,15 +91,14 @@ class CreateBlock(QDialog):
             base = json.load(file)
 
         # new block in base
-        if self.place_title.text() and (self.place_login.text() or self.place_password.text()):
-            base['datas'][self.place_title.text()] = [self.place_login.text(), self.place_password.text()]
+        if self.place_title.text() and self.place_login.text():
+            base['datas'][self.place_title.text()] = self.place_login.text().split()
 
         with open('data.json', 'w') as file:
             json.dump(base, file)
         
         self.place_title.clear()
         self.place_login.clear()
-        self.place_password.clear()
         return self.close()
 
 class Widget(QWidget):
@@ -89,6 +116,7 @@ class Widget(QWidget):
         self.all_blocks = []
 
         self.blocks_of_data = QListWidget()
+        self.blocks_of_data.itemDoubleClicked.connect(self.full_review_of_block)
         self.blocks_of_data.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.blocks_of_data.setObjectName('blocks_of_data')
 
@@ -97,7 +125,7 @@ class Widget(QWidget):
             base = json.load(file)
         queue_block = 1
         for i in base['datas'].keys():
-            self.all_blocks.append(f" {queue_block}. {i} | {" ".join(base['datas'][i])}")
+            self.all_blocks.append(f" {queue_block}. {i}")
             queue_block += 1
         queue_block = 1
         for k in self.all_blocks:
@@ -159,6 +187,28 @@ class Widget(QWidget):
     def add_block_of_data(self):
         self.window_addBlock.show()
 
+    def full_review_of_block(self):
+        selectedBlock = self.blocks_of_data.currentItem()
+        numberBlock = ""
+        for num in selectedBlock.text():
+            if num != '.':
+                numberBlock += num
+            else:
+                break
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+
+        count = 0
+        key_in_base = ""
+        for key in base['datas']:
+            if count == int(numberBlock)-1:
+                key_in_base = key
+                break
+            count += 1
+        item = base['datas'][key_in_base]
+        self.window_content = ContentBlock(item)
+        self.window_content.show()
+
     # updating of content for main window
     def updating(self):
         self.blocks_of_data.clear()
@@ -167,7 +217,7 @@ class Widget(QWidget):
             base = json.load(file)
         queue_block = 1
         for i in base['datas'].keys():
-            self.all_blocks.append(f" {queue_block}. {i} | {" ".join(base['datas'][i])}")
+            self.all_blocks.append(f" {queue_block}. {i}")
             queue_block += 1
         queue_block = 1
         for k in self.all_blocks:
