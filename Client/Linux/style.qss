@@ -118,3 +118,17 @@ QPushButton#btn_cancel::hover {
     font: bold 15px;
     border-radius: 15px;
 }
+
+QPushButton#btn_updating {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_updating::hover {
+    background: #388fd1;
+    color: #152d4f;
+    font: bold 15px;
+    border-radius: 15px;
+}

@@ -4,36 +4,35 @@ from PySide6.QtWidgets import *
 
 class CreateBlock(QDialog):
     def __init__(self, parent=None):
-        super().__init__(parent)
-        self.parent = parent
+        super().__init__()
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
         #self.setWindowTitle("Add block of data")
 
-        self.place_title = QLineEdit("Title")
+        self.place_title = QLineEdit()
         self.place_title.setObjectName('place_title')
 
-        self.place_login = QLineEdit("Login")
+        self.place_login = QLineEdit()
         self.place_login.setObjectName('place_login')
         
-        self.place_password = QLineEdit("Password")
+        self.place_password = QLineEdit()
         self.place_password.setObjectName('place_password')
         
-        self.btn_cancel = QPushButton("Done")
+        self.btn_cancel = QPushButton("Cancel")
         self.btn_cancel.setMaximumWidth(80)
         self.btn_cancel.setMinimumWidth(80)
         self.btn_cancel.setMaximumHeight(50)
         self.btn_cancel.setMinimumHeight(50)
-        self.btn_cancel.clicked.connect(lambda: self.close())
-        self.btn_cancel.setObjectName('btn_done')
+        self.btn_cancel.clicked.connect(self.close_window)
+        self.btn_cancel.setObjectName('btn_cancel')
 
-        self.btn_done = QPushButton("Cancel")
+        self.btn_done = QPushButton("Done")
         self.btn_done.setMaximumWidth(80)
         self.btn_done.setMinimumWidth(80)
         self.btn_done.setMaximumHeight(50)
         self.btn_done.setMinimumHeight(50)
-        self.btn_done.clicked.connect(self.done)
-        self.btn_done.setObjectName('btn_cancel')
+        self.btn_done.clicked.connect(self.done_window)
+        self.btn_done.setObjectName('btn_done')
 
         self.place_titleLogPass = QVBoxLayout()
         self.place_titleLogPass.addWidget(self.place_title)
@@ -41,9 +40,9 @@ class CreateBlock(QDialog):
         self.place_titleLogPass.addWidget(self.place_password)
 
         self.place_menuOfBtns = QHBoxLayout()
-        self.place_menuOfBtns.addWidget(self.btn_cancel)
         self.place_menuOfBtns.addWidget(self.btn_done)
-
+        self.place_menuOfBtns.addWidget(self.btn_cancel)
+        
         self.field_titleLogPass = QWidget()
         self.field_titleLogPass.setLayout(self.place_titleLogPass)
 
@@ -56,16 +55,24 @@ class CreateBlock(QDialog):
 
         self.setLayout(self.dialog_window)
 
-    def done(self):
+    def close_window(self):
+        return self.close()
+
+    def done_window(self):
         with open('data.json', 'r') as file:
-            data = json.load(file)
+            base = json.load(file)
 
-        # добавляем новое значение в JSON данные
-        data['datas']['новый_ключ'] = 'новое_значение'
+        # new block in base
+        if self.place_title.text() and (self.place_login.text() or self.place_password.text()):
+            base['datas'][self.place_title.text()] = [self.place_login.text(), self.place_password.text()]
 
-        # открываем JSON файл для записи
         with open('data.json', 'w') as file:
-            json.dump(data, file)
+            json.dump(base, file)
+        
+        self.place_title.clear()
+        self.place_login.clear()
+        self.place_password.clear()
+        return self.close()
 
 class Widget(QWidget):
     def __init__(self):
@@ -78,18 +85,23 @@ class Widget(QWidget):
         self.setMinimumHeight(500)
         self.setMinimumWidth(400)
 
+        # for all blocks of datas
+        self.all_blocks = []
+
         self.blocks_of_data = QListWidget()
         self.blocks_of_data.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        #self.blocks_of_data.setObjectName('blocks_of_data')
+        self.blocks_of_data.setObjectName('blocks_of_data')
 
+        # content of main window
         with open('data.json', 'r') as file:
-            data = json.load(file)
+            base = json.load(file)
         queue_block = 1
-        for i in data['datas'].keys():
-            item = QListWidgetItem(f" {queue_block} {i} | {" ".join(data['datas'][i])}")
-            ##item.setTextAlignment(Qt.AlignCenter)
-            self.blocks_of_data.addItem(item)
+        for i in base['datas'].keys():
+            self.all_blocks.append(f" {queue_block}. {i} | {" ".join(base['datas'][i])}")
             queue_block += 1
+        queue_block = 1
+        for k in self.all_blocks:
+            self.blocks_of_data.addItem(k)
 
         self.btn_Exit = QPushButton("Exit")
         self.btn_Exit.setMaximumWidth(80)
@@ -98,6 +110,14 @@ class Widget(QWidget):
         self.btn_Exit.setMinimumHeight(50)
         self.btn_Exit.clicked.connect(self.exit_from_app)
         self.btn_Exit.setObjectName('btn_Exit')
+
+        self.btn_updating = QPushButton("Update")
+        self.btn_updating.setMaximumWidth(80)
+        self.btn_updating.setMinimumWidth(80)
+        self.btn_updating.setMaximumHeight(50)
+        self.btn_updating.setMinimumHeight(50)
+        self.btn_updating.clicked.connect(self.updating)
+        self.btn_updating.setObjectName('btn_updating')
 
         self.btn_delBlock = QPushButton("Delete")
         self.btn_delBlock.setMaximumWidth(80)
@@ -121,6 +141,7 @@ class Widget(QWidget):
         self.btn_panel = QHBoxLayout()
         self.btn_panel.addWidget(self.btn_addBlock)
         self.btn_panel.addWidget(self.btn_delBlock)
+        self.btn_panel.addWidget(self.btn_updating)
         self.btn_panel.addWidget(self.btn_Exit)
 
         self.table_of_blocks = QWidget()
@@ -138,8 +159,54 @@ class Widget(QWidget):
     def add_block_of_data(self):
         self.window_addBlock.show()
 
+    # updating of content for main window
+    def updating(self):
+        self.blocks_of_data.clear()
+        self.all_blocks = []
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+        queue_block = 1
+        for i in base['datas'].keys():
+            self.all_blocks.append(f" {queue_block}. {i} | {" ".join(base['datas'][i])}")
+            queue_block += 1
+        queue_block = 1
+        for k in self.all_blocks:
+            self.blocks_of_data.addItem(k)
+
+    # deletes a block of data from the manager
     def del_block_of_data(self):
-        pass
+
+        # selected block of data
+        selectedBlock = self.blocks_of_data.currentItem()
+        numberBlock = ""
+        for num in selectedBlock.text():
+            if num != '.':
+                numberBlock += num
+            else:
+                break
+        
+        ####################################
+        #
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+
+        # find the necessary element to delete
+        # and delete it
+        count = 0
+        key_in_base = ""
+        for key in base['datas']:
+            if count == int(numberBlock)-1:
+                key_in_base = key
+                break
+            count += 1
+        del base['datas'][key_in_base]
+
+        with open('data.json', 'w') as file:
+            json.dump(base, file)
+        #
+        ####################################
+
+        self.updating() # update manager window
 
     def exit_from_app(self):
         sys.exit()
