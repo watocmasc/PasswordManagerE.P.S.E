@@ -9,10 +9,8 @@ class PasswordGeneration(QWidget):
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
 
-        #self.move()
-
         self.place_new_password = QLineEdit()
-        self.place_new_password.setPlaceholderText("Password length")
+        self.place_new_password.setPlaceholderText(" "+"Password length")
         self.place_new_password.setMaximumHeight(50)
         self.place_new_password.setMinimumHeight(50)
         self.place_new_password.setObjectName('place_new_password')
@@ -23,7 +21,7 @@ class PasswordGeneration(QWidget):
         self.btn_generate.setMaximumHeight(50)
         self.btn_generate.setMinimumHeight(50)
         self.btn_generate.clicked.connect(self.generate_password)
-        self.btn_generate.setObjectName('btn_done')
+        self.btn_generate.setObjectName('btn_generate')
 
         self.btn_cancel = QPushButton()
         self.btn_cancel.setMaximumWidth(100)
@@ -68,10 +66,9 @@ class PasswordGeneration(QWidget):
         return self.close()
 
 class ContentBlock(QWidget):
-    def __init__(self, items):
+    def __init__(self, number_of_block, title_block, value_of_block):
         super().__init__()
-        self.items = items
-    
+            
         self.setWindowTitle("Block information")
 
         # Propertions of main window
@@ -80,38 +77,52 @@ class ContentBlock(QWidget):
 
         self.move(490, 290)
 
-        self.elements_of_info = []
+        self.number_of_block = number_of_block
+        self.value_of_block = value_of_block
 
+        self.title_block = QLineEdit(f' {title_block}')
+        self.title_block.setMinimumHeight(50)
+        self.title_block.setMinimumWidth(100)
+        self.title_block.setObjectName('item_info')
+
+        self.title_and_values_of_block = [] 
+
+        # Creates a list of block 
+        # values and also adds its name
         self.all_info = QVBoxLayout()
         self.all_info.setObjectName('all_info')
-        for item in self.items:
-            item = QLineEdit(f' {item}')
-            item.setMinimumHeight(50)
-            item.setMinimumWidth(100)
-            item.setObjectName('item_info')
-            self.elements_of_info.append(item)
-        for item in self.elements_of_info:
-            self.all_info.addWidget(item)
-        #self.all_info.itemDoubleClicked.connect(self.full_review_of_block)
+        self.title_and_values_of_block.append(self.title_block)
+        for value in self.value_of_block:
+            value = QLineEdit(f' {value}')
+            value.setMinimumHeight(50)
+            value.setMinimumWidth(100)
+            value.setObjectName('item_info')
+            self.title_and_values_of_block.append(value)
+        for value in self.title_and_values_of_block:
+            self.all_info.addWidget(value)
 
-        self.btn_ok = QPushButton()
-        self.btn_ok.setMaximumWidth(60)
-        self.btn_ok.setMinimumWidth(60)
-        self.btn_ok.setMaximumHeight(60)
-        self.btn_ok.setMinimumHeight(60)
-        self.btn_ok.clicked.connect(self.close_window)
-        self.btn_ok.setObjectName('btn_Exit')
+        # Buttons #######################################
+        self.btn_save = QPushButton()
+        self.btn_save.setMaximumWidth(60)
+        self.btn_save.setMinimumWidth(60)
+        self.btn_save.setMaximumHeight(60)
+        self.btn_save.setMinimumHeight(60)
+        self.btn_save.clicked.connect(self.save_changes)
+        self.btn_save.setObjectName('btn_done')
 
-        #self.btn_cancel = QPushButton("Cancel")
-        #self.btn_cancel.setMaximumWidth(80)
-        #self.btn_cancel.setMinimumWidth(80)
-        #self.btn_cancel.setMaximumHeight(50)
-        #self.btn_cancel.setMinimumHeight(50)
-        #self.btn_cancel.clicked.connect(self.close_window)
-        #self.btn_cancel.setObjectName('btn_cancel')
+        self.btn_cancel = QPushButton()
+        self.btn_cancel.setMaximumWidth(60)
+        self.btn_cancel.setMinimumWidth(60)
+        self.btn_cancel.setMaximumHeight(60)
+        self.btn_cancel.setMinimumHeight(60)
+        self.btn_cancel.clicked.connect(self.close_window)
+        self.btn_cancel.setObjectName('btn_Exit')
+        # Buttons #######################################
 
+        # Menu layout #######################################
         self.menu_btn = QHBoxLayout()
-        self.menu_btn.addWidget(self.btn_ok)
+        self.menu_btn.addWidget(self.btn_save)
+        self.menu_btn.addWidget(self.btn_cancel)
 
         self.part1_window = QWidget()
         self.part1_window.setLayout(self.all_info)
@@ -119,26 +130,33 @@ class ContentBlock(QWidget):
         self.part2_window = QWidget()
         self.part2_window.setLayout(self.menu_btn)
 
-        self.parts_window = QVBoxLayout()
-        self.parts_window.addWidget(self.part1_window)
-        self.parts_window.addWidget(self.part2_window)
+        self.main_window = QVBoxLayout()
+        self.main_window.addWidget(self.part1_window)
+        self.main_window.addWidget(self.part2_window)
 
-        self.setLayout(self.parts_window)
-
-    '''
-    def save_info(self):
-        new_value_info = []
-        index = 0
-        for item in self.elements_of_info:
-            self.elements_of_info[index] = item
-            index += 1
-        self.all_info = QVBoxLayout()
-        self.all_info.setObjectName('all_info')
-        for item in self.elements_of_info:
-            self.all_info.addWidget(item)
-        self.close()
-    '''
+        self.setLayout(self.main_window)
+        # Menu layout #######################################
         
+    def save_changes(self):
+
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+
+        # Finds the required data block, 
+        # deletes the old value and writes a new one to it
+        score_key = 0
+        for key in list(base['datas'].keys()):
+            if score_key == self.number_of_block: 
+                del base['datas'][key] # old value
+                # new value
+                base['datas'][self.title_and_values_of_block[0].text().strip()] = [k.text().strip() for k in self.title_and_values_of_block[1:]]
+            score_key += 1
+
+        with open('data.json', 'w') as file:
+            json.dump(base, file)
+
+        self.close()
+
     def close_window(self):
         self.close()
 
@@ -146,43 +164,42 @@ class CreateBlock(QDialog):
     def __init__(self, parent=None):
         super().__init__()
 
-        self.setWindowTitle("EPSE: Create block")
-
+        self.setWindowTitle("EPSE: Adding new data")
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
-        #self.setWindowTitle("Add block of data")
 
-        #self.move(790, 290)
-
+        # Buttons and Fields #######################################
         self.place_title = QLineEdit()
         self.place_title.setMinimumHeight(50)
-        self.place_title.setPlaceholderText("Block names")
+        self.place_title.setPlaceholderText(" "+"Title")
         self.place_title.setObjectName('place_title')
 
-        self.place_login = QLineEdit()
-        self.place_login.setMinimumHeight(50)
-        self.place_login.setPlaceholderText("The content of the block")
-        self.place_login.setObjectName('place_login')
+        self.place_content = QLineEdit()
+        self.place_content.setMinimumHeight(50)
+        self.place_content.setPlaceholderText(" "+"Content")
+        self.place_content.setObjectName('place_content')
         
         self.btn_cancel = QPushButton()
-        self.btn_cancel.setMaximumWidth(80)
-        self.btn_cancel.setMinimumWidth(80)
-        self.btn_cancel.setMaximumHeight(50)
-        self.btn_cancel.setMinimumHeight(50)
+        self.btn_cancel.setMaximumWidth(60)
+        self.btn_cancel.setMinimumWidth(60)
+        self.btn_cancel.setMaximumHeight(60)
+        self.btn_cancel.setMinimumHeight(60)
         self.btn_cancel.clicked.connect(self.close_window)
         self.btn_cancel.setObjectName('btn_Exit')
 
-        self.btn_done = QPushButton("Done")
+        self.btn_done = QPushButton()
         self.btn_done.setMaximumWidth(60)
         self.btn_done.setMinimumWidth(60)
         self.btn_done.setMaximumHeight(60)
         self.btn_done.setMinimumHeight(60)
         self.btn_done.clicked.connect(self.done_window)
         self.btn_done.setObjectName('btn_done')
+        # Buttons and Fields #######################################
 
+        # Menu layout #######################################
         self.place_titleLogPass = QVBoxLayout()
         self.place_titleLogPass.addWidget(self.place_title)
-        self.place_titleLogPass.addWidget(self.place_login)
+        self.place_titleLogPass.addWidget(self.place_content)
 
         self.place_menuOfBtns = QHBoxLayout()
         self.place_menuOfBtns.addWidget(self.btn_done)
@@ -199,6 +216,7 @@ class CreateBlock(QDialog):
         self.dialog_window.addWidget(self.field_btns)
 
         self.setLayout(self.dialog_window)
+        # Menu layout #######################################
 
     def close_window(self):
         return self.close()
@@ -208,35 +226,36 @@ class CreateBlock(QDialog):
             base = json.load(file)
 
         # new block in base
-        if self.place_title.text() and self.place_login.text():
-            base['datas'][self.place_title.text()] = self.place_login.text().split()
+        if self.place_title.text() and self.place_content.text():
+            base['datas'][self.place_title.text()] = self.place_content.text().split()
 
         with open('data.json', 'w') as file:
             json.dump(base, file)
         
         self.place_title.clear()
-        self.place_login.clear()
+        self.place_content.clear()
         return self.close()
 
 class Window(QWidget):
     def __init__(self):
         super().__init__()
 
+        # Propertions of main window
         self.setWindowTitle("EPSE")
+        self.setMinimumHeight(500)
+        self.setMinimumWidth(400)
+        self.move(790, 290)
 
-        # Window Dialog
+        # Additional windows | Create block of data
         self.window_addBlock = CreateBlock()
         self.window_generatePassword = PasswordGeneration()
 
-        # Propertions of main window
-        self.setMinimumHeight(500)
-        self.setMinimumWidth(400)
-
-        self.move(790, 290)
+        # The contents of the main window #######################################
 
         # for all blocks of datas
-        self.all_blocks = []
+        self.titles_blocks = []
 
+        # A list of all data for further display
         self.blocks_of_data = QListWidget()
         self.blocks_of_data.itemDoubleClicked.connect(self.full_review_of_block)
         self.blocks_of_data.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -246,13 +265,15 @@ class Window(QWidget):
         with open('data.json', 'r') as file:
             base = json.load(file)
         queue_block = 1
-        for i in base['datas'].keys():
-            self.all_blocks.append(f" {queue_block}. {i}")
+        for title in base['datas'].keys():
+            self.titles_blocks.append(f" {queue_block}. {title}")
             queue_block += 1
-        queue_block = 1
-        for k in self.all_blocks:
-            self.blocks_of_data.addItem(k)
 
+        for title_item in self.titles_blocks:
+            self.blocks_of_data.addItem(title_item)
+        # The contents of the main window #######################################
+
+        # Buttons #######################################
         self.btn_Exit = QPushButton()
         self.btn_Exit.setMaximumWidth(60)
         self.btn_Exit.setMinimumWidth(60)
@@ -292,9 +313,11 @@ class Window(QWidget):
         self.btn_passGeneration.setMinimumHeight(50)
         self.btn_passGeneration.clicked.connect(self.password_generate)
         self.btn_passGeneration.setObjectName('btn_passGenerate')
+        # Buttons #######################################
 
-        self.content = QVBoxLayout()
-        self.content.addWidget(self.blocks_of_data)
+        # Menu layout #######################################
+        self.blocks_from_data = QVBoxLayout()
+        self.blocks_from_data.addWidget(self.blocks_of_data)
 
         self.btn_panel_first = QHBoxLayout()
         self.btn_panel_first.addWidget(self.btn_addBlock)
@@ -305,9 +328,8 @@ class Window(QWidget):
         self.btn_panel_second = QHBoxLayout()
         self.btn_panel_second.addWidget(self.btn_passGeneration)
         
-
         self.table_of_blocks = QWidget()
-        self.table_of_blocks.setLayout(self.content)
+        self.table_of_blocks.setLayout(self.blocks_from_data)
 
         self.main_btns = QWidget()
         self.main_btns.setLayout(self.btn_panel_first)
@@ -321,6 +343,7 @@ class Window(QWidget):
         self.main_window.addWidget(self.second_btns)
 
         self.setLayout(self.main_window)
+        # Menu layout #######################################
 
     def password_generate(self):
         self.window_generatePassword.show()
@@ -328,6 +351,7 @@ class Window(QWidget):
     def add_block_of_data(self):
         self.window_addBlock.show()
 
+    # Viewing the contents of the title
     def full_review_of_block(self):
         selectedBlock = self.blocks_of_data.currentItem()
         numberBlock = ""
@@ -346,8 +370,8 @@ class Window(QWidget):
                 key_in_base = key
                 break
             count += 1
-        item = base['datas'][key_in_base]
-        self.window_content = ContentBlock(item)
+        items = base['datas'][key_in_base] # content of title to view
+        self.window_content = ContentBlock(int(numberBlock)-1, key_in_base, items)
         self.window_content.show()
 
     # updating of content for main window

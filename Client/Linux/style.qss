@@ -38,7 +38,7 @@ QLineEdit#place_title {
     border-radius: 20px;
 }
 
-QLineEdit#place_login {
+QLineEdit#place_content {
     background-color: #282828;
     color: white;
     font-size: 20px;
@@ -124,16 +124,31 @@ QPushButton#btn_updateBlocks::hover {
 
 QPushButton#btn_done {
     background: #282828;
-    color: white;
-    font-size: 15px;
+    background-image: url("img/accept.svg");
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 15px;
 }
 
 QPushButton#btn_done::hover {
     background: #57d138;
-    color: #214f15;
-    font: bold 15px;
+    background-image: url("img/accept.svg");
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 15px;
+}
+
+QPushButton#btn_generate {
+    background: #282828;
+    font-size: 20px;
+    color: white;
+    border-radius: 15px;
+}
+
+QPushButton#btn_generate::hover {
+    background: #57d138;
+    font: bold;
+    border-radius: 14px;
 }
 
 QPushButton#btn_cancel {
