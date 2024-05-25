@@ -9,8 +9,6 @@ class PasswordGeneration(QWidget):
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
 
-        #self.move()
-
         self.place_new_password = QLineEdit()
         self.place_new_password.setPlaceholderText("Password length")
         self.place_new_password.setMaximumHeight(50)
@@ -72,13 +70,9 @@ class ContentBlock(QWidget):
         super().__init__()
         self.items = items
     
-        self.setWindowTitle("Block information")
-
         # Propertions of main window
         self.setMinimumHeight(200)
         self.setMinimumWidth(300)
-
-        self.move(490, 290)
 
         self.elements_of_info = []
 
@@ -145,14 +139,9 @@ class ContentBlock(QWidget):
 class CreateBlock(QDialog):
     def __init__(self, parent=None):
         super().__init__()
-
-        self.setWindowTitle("EPSE: Create block")
-
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
         #self.setWindowTitle("Add block of data")
-
-        #self.move(790, 290)
 
         self.place_title = QLineEdit()
         self.place_title.setMinimumHeight(50)
@@ -222,8 +211,6 @@ class Window(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("EPSE")
-
         # Window Dialog
         self.window_addBlock = CreateBlock()
         self.window_generatePassword = PasswordGeneration()
@@ -231,8 +218,6 @@ class Window(QWidget):
         # Propertions of main window
         self.setMinimumHeight(500)
         self.setMinimumWidth(400)
-
-        self.move(790, 290)
 
         # for all blocks of datas
         self.all_blocks = []

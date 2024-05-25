@@ -1,0 +1,178 @@
+QWidget {
+    background: black;
+}
+
+QDialog {
+    background: black;
+    border-radius: 15px;
+}
+
+QListWidget {
+    color: white;
+    background-color: #282828;
+    border-radius: 15px;
+    font: 15px "Bahnschrift", sans-serif;
+}
+
+QListWidget::item {
+    height: 50px;
+    color: white;
+    border-color: #282828;
+}
+
+QListWidget::item:selected {
+    background-color: #6b6b6b;
+    border-radius: 15px;
+    color: black;
+}
+
+QLabel {
+    background-color: #FFFFFF;
+    qproperty-alignment: AlignCenter;
+}
+
+QLineEdit#place_title {
+    background-color: #282828;
+    color: white;
+    font-size: 20px;
+    border-radius: 20px;
+}
+
+QLineEdit#place_login {
+    background-color: #282828;
+    color: white;
+    font-size: 20px;
+    border-radius: 20px;
+}
+
+QLineEdit#place_password {
+    background-color: #282828;
+    color: white;
+    font-size: 15px;
+}
+
+QLineEdit#place_new_password {
+    background-color: #282828;
+    color: white;
+    font-size: 20px;
+    border-radius: 20px;
+    margin-left: 10px;
+}
+
+QPushButton#btn_addBlock {
+    background-color: #282828;
+    background-image: url("img/add.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_addBlock::hover {
+    background-color: #57d138;
+    background-image: url("img/add.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QPushButton#btn_delBlock {
+    background-color: #282828;
+    background-image: url("img/delete.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_delBlock::hover {
+    background-color: #d13838;
+    background-image: url("img/delete.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_Exit {
+    background-color: #282828;
+    background-image: url("img/exit.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_Exit::hover {
+    background: #d13838;
+    background-image: url("img/exit.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_updateBlocks {
+    background-color: #282828;
+    background-image: url("img/update.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_updateBlocks::hover {
+    background-color: #388fd1;
+    background-image: url("img/update.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_done {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_done::hover {
+    background: #57d138;
+    color: #214f15;
+    font: bold 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_cancel {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_cancel::hover {
+    background: #d13838;
+    color: #4f1515;
+    font: bold 15px;
+    border-radius: 15px;
+}
+
+QPushButton#btn_passGenerate {
+    background-color: #282828;
+    color: white;
+    font-size: 16px;
+    font-family: "Bahnschrift", sans-serif;
+    border-radius: 15px;
+}
+
+QPushButton#btn_passGenerate::hover {
+    font: bold 16px;
+    color: #4f3615;
+    background-color: #d1c738;
+    border-radius: 15px;
+}
+
+QVBoxLayout#all_info {
+    background: #282828;
+    color: white;
+}
+
+QLineEdit#item_info {
+    background: #282828;
+    color: white;
+    font-size: 15px;
+    border-radius: 20px;
+}
