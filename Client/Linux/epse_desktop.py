@@ -52,6 +52,7 @@ class PasswordGeneration(QWidget):
 
     def generate_password(self):
         import random as rt
+        import pyperclip as pp
         new_password = ""
         try:
             length_password = int(self.place_new_password.text().strip())
@@ -59,6 +60,7 @@ class PasswordGeneration(QWidget):
             for i in range(length_password):
                 new_password += symbols[rt.randint(0,len(symbols)-1)]
             self.place_new_password.setText(f'{new_password}')
+            pp.copy(new_password)
         except:
             pass
 
