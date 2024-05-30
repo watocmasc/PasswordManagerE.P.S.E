@@ -14,10 +14,10 @@
 
 ## Build
 ### Dependencies
-* `pip install pytermgui`
-* `pip install pyperclip`
-* `pip install cryptography`
-* `pip install nuitka`
+* `pip install pytermgui` — TUI for terminal(console)
+* `pip install pyperclip` — to copy passwords/usernames and other data
+* `pip install cryptography` — to encrypt the database
+* `pip install nuitka` — for compiling from sources
 
 ### Compilation
 `nuitka --follow-imports windows.py`
