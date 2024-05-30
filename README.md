@@ -2,7 +2,7 @@
 ### ***Encryption-Protection-Storage-Exchange***
 > More than a password manager
 
-# <img src="img/bash-dark.svg" width=40 height=40> Linux CLI 
+# <img src="img/console.svg" width=30 height=30> Linux CLI 
 ### **Description**
 * To work, you need to register by creating a password for further login
 * In the program, everything is divided into blocks, a block has a name and data, each data has a name
@@ -12,7 +12,7 @@
 * Changing the password to log in to the program
 * 10 attempts to log in, otherwise deleting the database
 
-## <img src="img/build-circle-outline-sharp.svg" width=25 height=25> Build
+## <img src="img/build.svg" width=25 height=25> Build
 ### Dependencies
 * `pip install pytermgui` — TUI for terminal(console)
 * `pip install pyperclip` — to copy passwords/usernames and other data
@@ -23,10 +23,10 @@
 `nuitka --follow-imports windows.py`
 or your other compiler
 
-## Using a ready-made program
+## <img src="user-circle-single.svg"> Using a ready-made program
 Remove the **"epse"** binary file from the **CLI/Linux/bin** directory and move it to the **/usr/bin/** directory or the directory for binary files of your system.
 
 ### Screenshot
 <img src="img/epse_cli.png">
 
-## <img src="img/icon_download.png" width=40px height=40px> <a href='https://github.com/watocmasc/PasswordManagerEPSE/archive/refs/heads/main.zip'>Download the sources right now</a>
+## <img src="img/icon_download.png" width=25 height=25> <a href='https://github.com/watocmasc/PasswordManagerEPSE/archive/refs/heads/main.zip'>Download the sources right now</a>
