@@ -29,4 +29,4 @@ Remove the **"epse"** binary file from the **CLI/Linux/bin** directory and move 
 ### Screenshot
 <img src="img/epse_cli.png">
 
-## <img src="img/icon_download.png" width=30 height=30> <a href='https://github.com/watocmasc/PasswordManagerEPSE/archive/refs/heads/main.zip'>Download the sources right now</a>
+## <img src="img/download.svg" width=30 height=30> <a href='https://github.com/watocmasc/PasswordManagerEPSE/archive/refs/heads/main.zip'>Download the sources right now</a>
