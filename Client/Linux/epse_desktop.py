@@ -3,6 +3,8 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PyQt6.QtGui import *
 
+mode = 0
+
 class PasswordGeneration(QWidget):
     def __init__(self):
         super().__init__()
@@ -429,11 +431,161 @@ class Window(QWidget):
     def exit_from_app(self):
         sys.exit()
 
+class RegisterWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setMinimumHeight(200)
+        self.setMinimumWidth(400)
+        self.setMaximumHeight(200)
+        self.setMaximumWidth(400)
+
+        self.window = Window()
+
+        self.title_signup = QLabel("Sign up")
+        self.title_signup.setMaximumHeight(50)
+        self.title_signup.setMinimumHeight(50)
+        self.title_signup.setObjectName("title_start_window")
+
+        self.place_password = QLineEdit()
+        self.place_password.setPlaceholderText(" "+"Password")
+        self.place_password.setMaximumHeight(50)
+        self.place_password.setMinimumHeight(50)
+        self.place_password.setObjectName('place_new_password')
+
+        self.btn_done = QPushButton()
+        self.btn_done.setMaximumWidth(100)
+        self.btn_done.setMinimumWidth(100)
+        self.btn_done.setMaximumHeight(50)
+        self.btn_done.setMinimumHeight(50)
+        self.btn_done.clicked.connect(self.done_window)
+        self.btn_done.setObjectName('btn_done')
+
+        self.btn_cancel = QPushButton()
+        self.btn_cancel.setMaximumWidth(100)
+        self.btn_cancel.setMinimumWidth(100)
+        self.btn_cancel.setMaximumHeight(50)
+        self.btn_cancel.setMinimumHeight(50)
+        self.btn_cancel.clicked.connect(self.close_window)
+        self.btn_cancel.setObjectName('btn_Exit')
+
+        self.place_btns = QHBoxLayout()
+        self.place_field_password = QVBoxLayout()
+        self.place = QVBoxLayout()
+
+        self.part1_window = QWidget()
+        self.part2_window = QWidget()
+
+        self.place_btns.addWidget(self.btn_done)
+        self.place_btns.addWidget(self.btn_cancel)
+        self.place_field_password.addWidget(self.title_signup)
+        self.place_field_password.addWidget(self.place_password)
+
+        self.part1_window.setLayout(self.place_field_password)
+        self.part2_window.setLayout(self.place_btns)
+
+        self.place.addWidget(self.part1_window)
+        self.place.addWidget(self.part2_window)
+
+        self.setLayout(self.place)
+
+    def done_window(self):
+        global mode
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+        if(self.place_password.text()):
+            base['password'] = self.place_password.text().strip()
+            with open('data.json', 'w') as file:
+                json.dump(base, file)
+            self.window.show()
+            self.close()
+
+    def close_window(self):
+        global mode
+        mode = False
+        self.close()
+
+class LoginWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setMinimumHeight(200)
+        self.setMinimumWidth(400)
+        self.setMaximumHeight(200)
+        self.setMaximumWidth(400)
+
+        self.window = Window()
+
+        self.title_signin = QLabel("Sign in")
+        self.title_signin.setMaximumHeight(50)
+        self.title_signin.setMinimumHeight(50)
+        self.title_signin.setObjectName("title_start_window")
+
+        self.place_password = QLineEdit()
+        self.place_password.setPlaceholderText(" "+"Password")
+        self.place_password.setMaximumHeight(50)
+        self.place_password.setMinimumHeight(50)
+        self.place_password.setObjectName('place_new_password')
+
+        self.btn_done = QPushButton()
+        self.btn_done.setMaximumWidth(100)
+        self.btn_done.setMinimumWidth(100)
+        self.btn_done.setMaximumHeight(50)
+        self.btn_done.setMinimumHeight(50)
+        self.btn_done.clicked.connect(self.done_window)
+        self.btn_done.setObjectName('btn_done')
+
+        self.btn_cancel = QPushButton()
+        self.btn_cancel.setMaximumWidth(100)
+        self.btn_cancel.setMinimumWidth(100)
+        self.btn_cancel.setMaximumHeight(50)
+        self.btn_cancel.setMinimumHeight(50)
+        self.btn_cancel.clicked.connect(self.close_window)
+        self.btn_cancel.setObjectName('btn_Exit')
+
+        self.place_btns = QHBoxLayout()
+        self.place_field_password = QVBoxLayout()
+        self.place = QVBoxLayout()
+
+        self.part1_window = QWidget()
+        self.part2_window = QWidget()
+
+        self.place_btns.addWidget(self.btn_done)
+        self.place_btns.addWidget(self.btn_cancel)
+        self.place_field_password.addWidget(self.title_signin)
+        self.place_field_password.addWidget(self.place_password)
+
+        self.part1_window.setLayout(self.place_field_password)
+        self.part2_window.setLayout(self.place_btns)
+
+        self.place.addWidget(self.part1_window)
+        self.place.addWidget(self.part2_window)
+
+        self.setLayout(self.place)
+
+
+    def done_window(self):
+        global mode
+        mode = 1
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+        if(self.place_password.text().strip() == base['password']):
+            self.window.show()
+            self.close()
+
+    def close_window(self):
+        self.close()
+
 if __name__ == "__main__":
     app = QApplication()
 
-    window = Window()
-    window.show()
+    with open('data.json', 'r') as file:
+        base = json.load(file)
+
+    if(base['password']):
+        loginWindow = LoginWindow()
+        loginWindow.show()
+    else:
+        registerWindow = RegisterWindow()
+        registerWindow.show()
 
     with open("style.qss", 'r') as f:
         _style = f.read()

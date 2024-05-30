@@ -2,6 +2,12 @@ QWidget {
     background: black;
 }
 
+QLabel#title_start_window {
+    background: none;
+    color: white;
+    font: 25px bold;
+}
+
 QDialog {
     background: black;
     border-radius: 15px;
@@ -140,7 +146,7 @@ QPushButton#btn_done::hover {
 
 QPushButton#btn_generate {
     background: #282828;
-    font-size: 20px;
+    font-size: 18px;
     color: white;
     border-radius: 15px;
 }
@@ -168,13 +174,13 @@ QPushButton#btn_cancel::hover {
 QPushButton#btn_passGenerate {
     background-color: #282828;
     color: white;
-    font-size: 16px;
+    font-size: 15px;
     font-family: "Bahnschrift", sans-serif;
     border-radius: 15px;
 }
 
 QPushButton#btn_passGenerate::hover {
-    font: bold 16px;
+    font: bold 14px;
     color: #4f3615;
     background-color: #d1c738;
     border-radius: 15px;
