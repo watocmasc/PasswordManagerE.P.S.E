@@ -3,13 +3,92 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PyQt6.QtGui import *
 
-mode = 0
+class ChangePassword(QDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("EPSE: Changing the password")
+        self.setMinimumHeight(200)
+        self.setMinimumWidth(400)
+
+        # Buttons and Fields #######################################
+        self.place_old_password = QLineEdit()
+        self.place_old_password.setMinimumHeight(50)
+        self.place_old_password.setPlaceholderText(" "+"Old password")
+        self.place_old_password.setObjectName('place_title')
+
+        self.place_new_password = QLineEdit()
+        self.place_new_password.setMinimumHeight(50)
+        self.place_new_password.setPlaceholderText(" "+"New password")
+        self.place_new_password.setObjectName('place_content')
+        
+        self.btn_cancel = QPushButton()
+        self.btn_cancel.setMaximumWidth(60)
+        self.btn_cancel.setMinimumWidth(60)
+        self.btn_cancel.setMaximumHeight(60)
+        self.btn_cancel.setMinimumHeight(60)
+        self.btn_cancel.clicked.connect(self.close_window)
+        self.btn_cancel.setObjectName('btn_Exit')
+
+        self.btn_done = QPushButton()
+        self.btn_done.setMaximumWidth(60)
+        self.btn_done.setMinimumWidth(60)
+        self.btn_done.setMaximumHeight(60)
+        self.btn_done.setMinimumHeight(60)
+        self.btn_done.clicked.connect(self.done_window)
+        self.btn_done.setObjectName('btn_done')
+        # Buttons and Fields #######################################
+
+        # Menu layout #######################################
+        self.place_titleLogPass = QVBoxLayout()
+        self.place_titleLogPass.addWidget(self.place_old_password)
+        self.place_titleLogPass.addWidget(self.place_new_password)
+
+        self.place_menuOfBtns = QHBoxLayout()
+        self.place_menuOfBtns.addWidget(self.btn_done)
+        self.place_menuOfBtns.addWidget(self.btn_cancel)
+        
+        self.field_titleLogPass = QWidget()
+        self.field_titleLogPass.setLayout(self.place_titleLogPass)
+
+        self.field_btns = QWidget()
+        self.field_btns.setLayout(self.place_menuOfBtns)
+
+        self.dialog_window = QVBoxLayout()
+        self.dialog_window.addWidget(self.field_titleLogPass)
+        self.dialog_window.addWidget(self.field_btns)
+
+        self.setLayout(self.dialog_window)
+        # Menu layout #######################################
+
+    def close_window(self):
+        self.place_old_password.clear()
+        self.place_new_password.clear()
+        self.close()
+
+    def done_window(self):
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+
+        # new block in base
+        if self.place_old_password.text().strip() == base['password']:
+            if self.place_new_password:
+                base['password'] = self.place_new_password.text().strip()
+
+                with open('data.json', 'w') as file:
+                    json.dump(base, file)
+                        
+                self.place_old_password.clear()
+                self.place_new_password.clear()
+                self.close()
 
 class PasswordGeneration(QWidget):
     def __init__(self):
         super().__init__()
+
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
+        self.setWindowTitle("EPSE: Password generation")
 
         self.place_new_password = QLineEdit()
         self.place_new_password.setPlaceholderText(" "+"Password length")
@@ -73,7 +152,7 @@ class ContentBlock(QWidget):
     def __init__(self, number_of_block, title_block, value_of_block):
         super().__init__()
             
-        self.setWindowTitle("Block information")
+        self.setWindowTitle("Block Data")
 
         # Propertions of main window
         self.setMinimumHeight(200)
@@ -165,7 +244,7 @@ class ContentBlock(QWidget):
         self.close()
 
 class CreateBlock(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
 
         self.setWindowTitle("EPSE: Adding new data")
@@ -253,6 +332,7 @@ class Window(QWidget):
         # Additional windows | Create block of data
         self.window_addBlock = CreateBlock()
         self.window_generatePassword = PasswordGeneration()
+        self.window_changePassword = ChangePassword()
 
         # The contents of the main window #######################################
 
@@ -278,13 +358,13 @@ class Window(QWidget):
         # The contents of the main window #######################################
 
         # Buttons #######################################
-        self.btn_Exit = QPushButton()
-        self.btn_Exit.setMaximumWidth(60)
-        self.btn_Exit.setMinimumWidth(60)
-        self.btn_Exit.setMaximumHeight(60)
-        self.btn_Exit.setMinimumHeight(60)
-        self.btn_Exit.clicked.connect(self.exit_from_app)
-        self.btn_Exit.setObjectName('btn_Exit')
+        self.btn_changePassword = QPushButton()
+        self.btn_changePassword.setMaximumWidth(60)
+        self.btn_changePassword.setMinimumWidth(60)
+        self.btn_changePassword.setMaximumHeight(60)
+        self.btn_changePassword.setMinimumHeight(60)
+        self.btn_changePassword.clicked.connect(self.change_password)
+        self.btn_changePassword.setObjectName('btn_changepassword')
 
         self.btn_updating = QPushButton()
         self.btn_updating.setMaximumWidth(60)
@@ -310,11 +390,11 @@ class Window(QWidget):
         self.btn_addBlock.clicked.connect(self.add_block_of_data)
         self.btn_addBlock.setObjectName('btn_addBlock')
 
-        self.btn_passGeneration = QPushButton('Password generation')
-        self.btn_passGeneration.setMaximumWidth(180)
-        self.btn_passGeneration.setMinimumWidth(180)
-        self.btn_passGeneration.setMaximumHeight(50)
-        self.btn_passGeneration.setMinimumHeight(50)
+        self.btn_passGeneration = QPushButton()
+        self.btn_passGeneration.setMaximumWidth(60)
+        self.btn_passGeneration.setMinimumWidth(60)
+        self.btn_passGeneration.setMaximumHeight(60)
+        self.btn_passGeneration.setMinimumHeight(60)
         self.btn_passGeneration.clicked.connect(self.password_generate)
         self.btn_passGeneration.setObjectName('btn_passGenerate')
         # Buttons #######################################
@@ -327,10 +407,8 @@ class Window(QWidget):
         self.btn_panel_first.addWidget(self.btn_addBlock)
         self.btn_panel_first.addWidget(self.btn_delBlock)
         self.btn_panel_first.addWidget(self.btn_updating)
-        self.btn_panel_first.addWidget(self.btn_Exit)
-
-        self.btn_panel_second = QHBoxLayout()
-        self.btn_panel_second.addWidget(self.btn_passGeneration)
+        self.btn_panel_first.addWidget(self.btn_changePassword)
+        self.btn_panel_first.addWidget(self.btn_passGeneration)
         
         self.table_of_blocks = QWidget()
         self.table_of_blocks.setLayout(self.blocks_from_data)
@@ -338,16 +416,15 @@ class Window(QWidget):
         self.main_btns = QWidget()
         self.main_btns.setLayout(self.btn_panel_first)
 
-        self.second_btns = QWidget()
-        self.second_btns.setLayout(self.btn_panel_second)
-
         self.main_window = QVBoxLayout()
         self.main_window.addWidget(self.table_of_blocks)
         self.main_window.addWidget(self.main_btns)
-        self.main_window.addWidget(self.second_btns)
 
         self.setLayout(self.main_window)
         # Menu layout #######################################
+
+    def change_password(self):
+        self.window_changePassword.show()
 
     def password_generate(self):
         self.window_generatePassword.show()
@@ -434,10 +511,12 @@ class Window(QWidget):
 class RegisterWindow(QWidget):
     def __init__(self):
         super().__init__()
+
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
         self.setMaximumHeight(200)
         self.setMaximumWidth(400)
+        self.setWindowTitle("EPSE: Sign up")
 
         self.window = Window()
 
@@ -500,17 +579,17 @@ class RegisterWindow(QWidget):
             self.close()
 
     def close_window(self):
-        global mode
-        mode = False
         self.close()
 
 class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
+
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
         self.setMaximumHeight(200)
         self.setMaximumWidth(400)
+        self.setWindowTitle("EPSE: Sign in")
 
         self.window = Window()
 
@@ -563,8 +642,6 @@ class LoginWindow(QWidget):
 
 
     def done_window(self):
-        global mode
-        mode = 1
         with open('data.json', 'r') as file:
             base = json.load(file)
         if(self.place_password.text().strip() == base['password']):

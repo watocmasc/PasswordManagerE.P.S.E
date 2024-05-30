@@ -65,6 +65,19 @@ QLineEdit#place_new_password {
     margin-left: 10px;
 }
 
+QPushButton#btn_changepassword {
+    background-color: #282828;
+    background-image: url("img/change_password.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_changepassword::hover {
+    background-color: #384cd1;
+    border-radius: 15px;
+}
+
 QPushButton#btn_addBlock {
     background-color: #282828;
     background-image: url("img/add.svg");
@@ -173,9 +186,9 @@ QPushButton#btn_cancel::hover {
 
 QPushButton#btn_passGenerate {
     background-color: #282828;
-    color: white;
-    font-size: 15px;
-    font-family: "Bahnschrift", sans-serif;
+    background-image: url("img/icon_password_generate.svg");
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 15px;
 }
 
