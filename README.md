@@ -23,7 +23,7 @@
 `nuitka --follow-imports windows.py`
 or your other compiler
 
-## <img src="user-circle-single.svg"> Using a ready-made program
+## <img src="img/user_account.svg"> Using a ready-made program
 Remove the **"epse"** binary file from the **CLI/Linux/bin** directory and move it to the **/usr/bin/** directory or the directory for binary files of your system.
 
 ### Screenshot
