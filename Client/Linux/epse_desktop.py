@@ -13,11 +13,13 @@ class ChangePassword(QDialog):
 
         # Buttons and Fields #######################################
         self.place_old_password = QLineEdit()
+        self.place_old_password.setClearButtonEnabled(True)
         self.place_old_password.setMinimumHeight(50)
         self.place_old_password.setPlaceholderText(" "+"Old password")
         self.place_old_password.setObjectName('place_title')
 
         self.place_new_password = QLineEdit()
+        self.place_new_password.setClearButtonEnabled(True)
         self.place_new_password.setMinimumHeight(50)
         self.place_new_password.setPlaceholderText(" "+"New password")
         self.place_new_password.setObjectName('place_content')
@@ -91,6 +93,7 @@ class PasswordGeneration(QWidget):
         self.setWindowTitle("EPSE: Password generation")
 
         self.place_new_password = QLineEdit()
+        self.place_new_password.setClearButtonEnabled(True)
         self.place_new_password.setPlaceholderText(" "+"Password length")
         self.place_new_password.setMaximumHeight(50)
         self.place_new_password.setMinimumHeight(50)
@@ -146,7 +149,8 @@ class PasswordGeneration(QWidget):
             pass
 
     def close_window(self):
-        return self.close()
+        self.place_new_password.clear()
+        self.close()
 
 class ContentBlock(QWidget):
     def __init__(self, number_of_block, title_block, value_of_block):
@@ -164,6 +168,7 @@ class ContentBlock(QWidget):
         self.value_of_block = value_of_block
 
         self.title_block = QLineEdit(f' {title_block}')
+        self.title_block.setClearButtonEnabled(True)
         self.title_block.setMinimumHeight(50)
         self.title_block.setMinimumWidth(100)
         self.title_block.setObjectName('item_info')
@@ -177,6 +182,7 @@ class ContentBlock(QWidget):
         self.title_and_values_of_block.append(self.title_block)
         for value in self.value_of_block:
             value = QLineEdit(f' {value}')
+            value.setClearButtonEnabled(True)
             value.setMinimumHeight(50)
             value.setMinimumWidth(100)
             value.setObjectName('item_info')
@@ -232,7 +238,11 @@ class ContentBlock(QWidget):
             if score_key == self.number_of_block: 
                 del base['datas'][key] # old value
                 # new value
-                base['datas'][self.title_and_values_of_block[0].text().strip()] = [k.text().strip() for k in self.title_and_values_of_block[1:]]
+                if self.title_and_values_of_block[0].text().strip():
+                    base['datas'][self.title_and_values_of_block[0].text().strip()] = [k.text().strip() for k in self.title_and_values_of_block[1:] if k.text().strip() != ""]
+                else:
+                    base['datas'][key] = [k.text().strip() for k in self.title_and_values_of_block[1:] if k.text().strip() != ""]
+
             score_key += 1
 
         with open('data.json', 'w') as file:
@@ -253,11 +263,13 @@ class CreateBlock(QDialog):
 
         # Buttons and Fields #######################################
         self.place_title = QLineEdit()
+        self.place_title.setClearButtonEnabled(True)
         self.place_title.setMinimumHeight(50)
         self.place_title.setPlaceholderText(" "+"Title")
         self.place_title.setObjectName('place_title')
 
         self.place_content = QLineEdit()
+        self.place_content.setClearButtonEnabled(True)
         self.place_content.setMinimumHeight(50)
         self.place_content.setPlaceholderText(" "+"Content")
         self.place_content.setObjectName('place_content')
@@ -512,13 +524,33 @@ class RegisterWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setMinimumHeight(200)
+        self.setMinimumHeight(300)
         self.setMinimumWidth(400)
-        self.setMaximumHeight(200)
+        self.setMaximumHeight(300)
         self.setMaximumWidth(400)
         self.setWindowTitle("EPSE: Sign up")
 
         self.window = Window()
+
+        # password entry format and style
+        #
+        # completely hidden
+        self.hidden_password = QCheckBox("Hide")
+        self.hidden_password.setStyleSheet("padding-left: 5px;")
+        self.hidden_password.setMaximumWidth(100)
+        self.hidden_password.setMaximumHeight(60)
+
+        # hidden by asterisks
+        self.stars_password = QCheckBox("123")
+        self.stars_password.setMaximumWidth(100)
+        self.stars_password.setMaximumHeight(60)
+        
+        self.hidden_password.setObjectName("style_password")
+        self.stars_password.setObjectName("style_password")
+
+        self.hidden_password.stateChanged.connect(self.on_hidden_password)
+        self.stars_password.stateChanged.connect(self.on_stars_password)
+        ##################################
 
         self.title_signup = QLabel("Sign up")
         self.title_signup.setMaximumHeight(50)
@@ -526,6 +558,7 @@ class RegisterWindow(QWidget):
         self.title_signup.setObjectName("title_start_window")
 
         self.place_password = QLineEdit()
+        self.place_password.setClearButtonEnabled(True)
         self.place_password.setPlaceholderText(" "+"Password")
         self.place_password.setMaximumHeight(50)
         self.place_password.setMinimumHeight(50)
@@ -548,27 +581,50 @@ class RegisterWindow(QWidget):
         self.btn_cancel.setObjectName('btn_Exit')
 
         self.place_btns = QHBoxLayout()
+        self.place_flags = QHBoxLayout()
         self.place_field_password = QVBoxLayout()
         self.place = QVBoxLayout()
 
         self.part1_window = QWidget()
         self.part2_window = QWidget()
+        self.part3_window = QWidget()
+
+        self.place_flags.addWidget(self.hidden_password)
+        self.place_flags.addWidget(self.stars_password)
 
         self.place_btns.addWidget(self.btn_done)
         self.place_btns.addWidget(self.btn_cancel)
+
         self.place_field_password.addWidget(self.title_signup)
         self.place_field_password.addWidget(self.place_password)
 
         self.part1_window.setLayout(self.place_field_password)
-        self.part2_window.setLayout(self.place_btns)
+        self.part2_window.setLayout(self.place_flags)
+        self.part3_window.setLayout(self.place_btns)
 
         self.place.addWidget(self.part1_window)
         self.place.addWidget(self.part2_window)
+        self.place.addWidget(self.part3_window)
 
         self.setLayout(self.place)
 
+    def on_hidden_password(self,state):
+        if state == 2:
+            self.place_password.setStyleSheet("color: transparent;")
+            self.hidden_password.setText("Hide")
+        else:
+            self.place_password.setStyleSheet("color: white;")
+            self.hidden_password.setText("Show")
+
+    def on_stars_password(self, state):
+        if state == 2:
+            self.place_password.setEchoMode(QLineEdit.EchoMode.Password)
+            self.stars_password.setText("***")
+        else:
+            self.place_password.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.stars_password.setText("123")
+
     def done_window(self):
-        global mode
         with open('data.json', 'r') as file:
             base = json.load(file)
         if(self.place_password.text()):
@@ -585,13 +641,28 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setMinimumHeight(200)
+        self.setMinimumHeight(300)
         self.setMinimumWidth(400)
-        self.setMaximumHeight(200)
+        self.setMaximumHeight(300)
         self.setMaximumWidth(400)
         self.setWindowTitle("EPSE: Sign in")
 
         self.window = Window()
+
+        self.hidden_password = QCheckBox("Hide")
+        self.hidden_password.setStyleSheet("padding-left: 5px;")
+        self.hidden_password.setMaximumWidth(100)
+        self.hidden_password.setMaximumHeight(60)
+
+        self.stars_password = QCheckBox("123")
+        self.stars_password.setMaximumWidth(100)
+        self.stars_password.setMaximumHeight(60)
+        
+        self.hidden_password.setObjectName("style_password")
+        self.stars_password.setObjectName("style_password")
+
+        self.hidden_password.stateChanged.connect(self.on_hidden_password)
+        self.stars_password.stateChanged.connect(self.on_stars_password)
 
         self.title_signin = QLabel("Sign in")
         self.title_signin.setMaximumHeight(50)
@@ -599,6 +670,7 @@ class LoginWindow(QWidget):
         self.title_signin.setObjectName("title_start_window")
 
         self.place_password = QLineEdit()
+        self.place_password.setClearButtonEnabled(True)
         self.place_password.setPlaceholderText(" "+"Password")
         self.place_password.setMaximumHeight(50)
         self.place_password.setMinimumHeight(50)
@@ -612,34 +684,48 @@ class LoginWindow(QWidget):
         self.btn_done.clicked.connect(self.done_window)
         self.btn_done.setObjectName('btn_done')
 
-        self.btn_cancel = QPushButton()
-        self.btn_cancel.setMaximumWidth(100)
-        self.btn_cancel.setMinimumWidth(100)
-        self.btn_cancel.setMaximumHeight(50)
-        self.btn_cancel.setMinimumHeight(50)
-        self.btn_cancel.clicked.connect(self.close_window)
-        self.btn_cancel.setObjectName('btn_Exit')
-
         self.place_btns = QHBoxLayout()
+        self.place_flags = QHBoxLayout()
         self.place_field_password = QVBoxLayout()
         self.place = QVBoxLayout()
 
         self.part1_window = QWidget()
         self.part2_window = QWidget()
+        self.part3_window = QWidget()
+
+        self.place_flags.addWidget(self.hidden_password)
+        self.place_flags.addWidget(self.stars_password)
 
         self.place_btns.addWidget(self.btn_done)
-        self.place_btns.addWidget(self.btn_cancel)
+
         self.place_field_password.addWidget(self.title_signin)
         self.place_field_password.addWidget(self.place_password)
 
         self.part1_window.setLayout(self.place_field_password)
-        self.part2_window.setLayout(self.place_btns)
+        self.part2_window.setLayout(self.place_flags)
+        self.part3_window.setLayout(self.place_btns)
 
         self.place.addWidget(self.part1_window)
         self.place.addWidget(self.part2_window)
+        self.place.addWidget(self.part3_window)
 
         self.setLayout(self.place)
 
+    def on_hidden_password(self,state):
+        if state == 2:
+            self.place_password.setStyleSheet("color: transparent;")
+            self.hidden_password.setText("Hide")
+        else:
+            self.place_password.setStyleSheet("color: white;")
+            self.hidden_password.setText("Show")
+
+    def on_stars_password(self, state):
+        if state == 2:
+            self.place_password.setEchoMode(QLineEdit.EchoMode.Password)
+            self.stars_password.setText("***")
+        else:
+            self.place_password.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.stars_password.setText("123")
 
     def done_window(self):
         with open('data.json', 'r') as file:

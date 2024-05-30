@@ -37,6 +37,28 @@ QLabel {
     qproperty-alignment: AlignCenter;
 }
 
+QCheckBox#style_password {
+    color: white;
+    font-size: 20px;
+    border: 2px solid white;
+    border-radius: 10px;
+    padding-left: 10px;
+}
+
+QCheckBox#style_password::indicator {
+    border: 2px solid transparent;
+    border-radius: 5px;
+}
+
+QCheckBox#style_password::checked {
+    color: black;
+    background: white;
+    QCheckBox#style_password::indicator {
+        border: 2px solid black;
+        border-radius: 2px;
+    }
+}
+
 QLineEdit#place_title {
     background-color: #282828;
     color: white;
@@ -62,7 +84,6 @@ QLineEdit#place_new_password {
     color: white;
     font-size: 20px;
     border-radius: 20px;
-    margin-left: 10px;
 }
 
 QPushButton#btn_changepassword {
