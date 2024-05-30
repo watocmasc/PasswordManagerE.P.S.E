@@ -27,6 +27,6 @@ or your other compiler
 Remove the **"epse"** binary file from the **CLI/Linux/bin** directory and move it to the **/usr/bin/** directory or the directory for binary files of your system.
 
 ### Screenshot
-<img src="epse_cli.png">
+<img src="img/epse_cli.png">
 
-## <a href='https://github.com/watocmasc/PasswordManagerEPSE/archive/refs/heads/main.zip'>Download the sources right now</a>
+## <a href='https://github.com/watocmasc/PasswordManagerEPSE/archive/refs/heads/main.zip'>Download the sources right now</a><img src='img/icon_donwload.svg'>
