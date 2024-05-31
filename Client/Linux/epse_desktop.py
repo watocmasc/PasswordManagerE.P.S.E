@@ -1,13 +1,14 @@
 import sys, json
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
-from PyQt6.QtGui import *
+from PySide6.QtGui import *
 
 class ChangePassword(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("EPSE: Changing the password")
+        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowTitle("Changing the password")
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
 
@@ -90,7 +91,8 @@ class PasswordGeneration(QWidget):
 
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
-        self.setWindowTitle("EPSE: Password generation")
+        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowTitle("Password generation")
 
         self.place_new_password = QLineEdit()
         self.place_new_password.setClearButtonEnabled(True)
@@ -156,6 +158,7 @@ class ContentBlock(QWidget):
     def __init__(self, number_of_block, title_block, value_of_block):
         super().__init__()
             
+        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))    
         self.setWindowTitle("Block Data")
 
         # Propertions of main window
@@ -257,7 +260,8 @@ class CreateBlock(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("EPSE: Adding new data")
+        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowTitle("Adding new data")
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
 
@@ -334,6 +338,8 @@ class CreateBlock(QDialog):
 class Window(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
 
         # Propertions of main window
         self.setWindowTitle("EPSE")
@@ -528,7 +534,8 @@ class RegisterWindow(QWidget):
         self.setMinimumWidth(400)
         self.setMaximumHeight(300)
         self.setMaximumWidth(400)
-        self.setWindowTitle("EPSE: Sign up")
+        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowTitle("Sign up")
 
         self.window = Window()
 
@@ -645,7 +652,8 @@ class LoginWindow(QWidget):
         self.setMinimumWidth(400)
         self.setMaximumHeight(300)
         self.setMaximumWidth(400)
-        self.setWindowTitle("EPSE: Sign in")
+        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowTitle("Sign in")
 
         self.window = Window()
 
