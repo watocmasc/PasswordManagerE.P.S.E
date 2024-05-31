@@ -2,6 +2,7 @@ import sys, json
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
+import cipher as cr
 
 class ChangePassword(QDialog):
     def __init__(self):
@@ -70,12 +71,13 @@ class ChangePassword(QDialog):
         self.close()
 
     def done_window(self):
+        cr.decrypt('data.json', cr.load_key())
         with open('data.json', 'r') as file:
             base = json.load(file)
 
         # new block in base
         if self.place_old_password.text().strip() == base['password']:
-            if self.place_new_password:
+            if self.place_new_password.text().strip():
                 base['password'] = self.place_new_password.text().strip()
 
                 with open('data.json', 'w') as file:
@@ -84,6 +86,7 @@ class ChangePassword(QDialog):
                 self.place_old_password.clear()
                 self.place_new_password.clear()
                 self.close()
+        cr.encrypt('data.json', cr.load_key())
 
 class PasswordGeneration(QWidget):
     def __init__(self):
@@ -230,7 +233,7 @@ class ContentBlock(QWidget):
         # Menu layout #######################################
         
     def save_changes(self):
-
+        cr.decrypt('data.json', cr.load_key())
         with open('data.json', 'r') as file:
             base = json.load(file)
 
@@ -250,6 +253,7 @@ class ContentBlock(QWidget):
 
         with open('data.json', 'w') as file:
             json.dump(base, file)
+        cr.encrypt('data.json', cr.load_key())
 
         self.close()
 
@@ -321,6 +325,7 @@ class CreateBlock(QDialog):
         return self.close()
 
     def done_window(self):
+        cr.decrypt('data.json', cr.load_key())
         with open('data.json', 'r') as file:
             base = json.load(file)
 
@@ -330,6 +335,7 @@ class CreateBlock(QDialog):
 
         with open('data.json', 'w') as file:
             json.dump(base, file)
+        cr.encrypt('data.json', cr.load_key())
         
         self.place_title.clear()
         self.place_content.clear()
@@ -363,7 +369,9 @@ class Window(QWidget):
         self.blocks_of_data.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.blocks_of_data.setObjectName('blocks_of_data')
 
-        # content of main window
+        # content of main windowf
+        cr.decrypt('data.json', cr.load_key())
+
         with open('data.json', 'r') as file:
             base = json.load(file)
         queue_block = 1
@@ -373,6 +381,8 @@ class Window(QWidget):
 
         for title_item in self.titles_blocks:
             self.blocks_of_data.addItem(title_item)
+
+        cr.encrypt('data.json', cr.load_key())
         # The contents of the main window #######################################
 
         # Buttons #######################################
@@ -452,6 +462,8 @@ class Window(QWidget):
 
     # Viewing the contents of the title
     def full_review_of_block(self):
+        cr.decrypt('data.json', cr.load_key())
+
         selectedBlock = self.blocks_of_data.currentItem()
         numberBlock = ""
         for num in selectedBlock.text():
@@ -459,6 +471,7 @@ class Window(QWidget):
                 numberBlock += num
             else:
                 break
+        
         with open('data.json', 'r') as file:
             base = json.load(file)
 
@@ -473,10 +486,15 @@ class Window(QWidget):
         self.window_content = ContentBlock(int(numberBlock)-1, key_in_base, items)
         self.window_content.show()
 
+        cr.encrypt('data.json', cr.load_key())
+
     # updating of content for main window
     def updating(self):
+        cr.decrypt('data.json', cr.load_key())
+
         self.blocks_of_data.clear()
         self.all_blocks = []
+
         with open('data.json', 'r') as file:
             base = json.load(file)
         queue_block = 1
@@ -486,6 +504,8 @@ class Window(QWidget):
         queue_block = 1
         for k in self.all_blocks:
             self.blocks_of_data.addItem(k)
+
+        cr.encrypt('data.json', cr.load_key())
 
     # deletes a block of data from the manager
     def del_block_of_data(self):
@@ -501,6 +521,7 @@ class Window(QWidget):
                     break
             ####################################
             #
+            cr.decrypt('data.json', cr.load_key())
             with open('data.json', 'r') as file:
                 base = json.load(file)
 
@@ -517,6 +538,8 @@ class Window(QWidget):
 
             with open('data.json', 'w') as file:
                 json.dump(base, file)
+
+            cr.encrypt('data.json', cr.load_key())
             #
             ####################################
         except:
@@ -632,14 +655,21 @@ class RegisterWindow(QWidget):
             self.stars_password.setText("123")
 
     def done_window(self):
+        cr.decrypt('data.json', cr.load_key())
+
         with open('data.json', 'r') as file:
             base = json.load(file)
+
         if(self.place_password.text()):
             base['password'] = self.place_password.text().strip()
+
             with open('data.json', 'w') as file:
                 json.dump(base, file)
+                
             self.window.show()
+
             self.close()
+        cr.encrypt('data.json', cr.load_key())
 
     def close_window(self):
         self.close()
@@ -736,25 +766,38 @@ class LoginWindow(QWidget):
             self.stars_password.setText("123")
 
     def done_window(self):
+        cr.decrypt('data.json', cr.load_key())
+
         with open('data.json', 'r') as file:
             base = json.load(file)
+
         if(self.place_password.text().strip() == base['password']):
             self.window.show()
             self.close()
 
+        cr.encrypt('data.json', cr.load_key())
+
     def close_window(self):
         self.close()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    try:
+        cr.decrypt('data.json', cr.load_key())
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+    except Exception:
+        with open('data.json', 'r') as file:
+            base = json.load(file)
+
     app = QApplication()
 
-    with open('data.json', 'r') as file:
-        base = json.load(file)
-
     if(base['password']):
+        cr.encrypt('data.json', cr.load_key())
         loginWindow = LoginWindow()
         loginWindow.show()
     else:
+        cr.write_key()
+        cr.encrypt('data.json', cr.load_key())
         registerWindow = RegisterWindow()
         registerWindow.show()
 
