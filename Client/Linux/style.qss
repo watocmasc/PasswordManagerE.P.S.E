@@ -34,7 +34,6 @@ QListWidget::item:selected {
 
 QLabel {
     background-color: #FFFFFF;
-    qproperty-alignment: AlignCenter;
 }
 
 QCheckBox#style_password {
@@ -98,6 +97,38 @@ QPushButton#btn_changepassword::hover {
     background-color: #384cd1;
     border-radius: 15px;
 }
+
+/* google drive buttons --------------------------------------------------*/
+QPushButton#btn_googleDriveDownload {
+    background-color: #282828;
+    background-image: url("img/drive_download.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_googleDriveDownload::hover {
+    background-color: white;
+    background-image: url("img/drive_download_hover.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QPushButton#btn_googleDriveDischarge {
+    background-color: #282828;
+    background-image: url("img/drive_discharge.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+}
+
+QPushButton#btn_googleDriveDischarge::hover {
+    background-color: white;
+    background-image: url("img/drive_discharge_hover.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+/* google drive buttons --------------------------------------------------*/
 
 QPushButton#btn_addBlock {
     background-color: #282828;

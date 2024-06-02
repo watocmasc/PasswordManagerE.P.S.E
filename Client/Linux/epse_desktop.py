@@ -2,6 +2,8 @@ import sys, json
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 import cipher as cr
 
 class ChangePassword(QDialog):
@@ -425,6 +427,22 @@ class Window(QWidget):
         self.btn_passGeneration.setMinimumHeight(60)
         self.btn_passGeneration.clicked.connect(self.password_generate)
         self.btn_passGeneration.setObjectName('btn_passGenerate')
+
+        self.btn_googleDriveDownload = QPushButton()
+        self.btn_googleDriveDownload.setMaximumWidth(60)
+        self.btn_googleDriveDownload.setMinimumWidth(60)
+        self.btn_googleDriveDownload.setMaximumHeight(60)
+        self.btn_googleDriveDownload.setMinimumHeight(60)
+        self.btn_googleDriveDownload.clicked.connect(self.downloadData_googleDrive)
+        self.btn_googleDriveDownload.setObjectName('btn_googleDriveDownload')
+
+        self.btn_googleDriveDischarge = QPushButton()
+        self.btn_googleDriveDischarge.setMaximumWidth(60)
+        self.btn_googleDriveDischarge.setMinimumWidth(60)
+        self.btn_googleDriveDischarge.setMaximumHeight(60)
+        self.btn_googleDriveDischarge.setMinimumHeight(60)
+        self.btn_googleDriveDischarge.clicked.connect(self.dischargeData_googleDrive)
+        self.btn_googleDriveDischarge.setObjectName('btn_googleDriveDischarge')
         # Buttons #######################################
 
         # Menu layout #######################################
@@ -437,6 +455,8 @@ class Window(QWidget):
         self.btn_panel_first.addWidget(self.btn_updating)
         self.btn_panel_first.addWidget(self.btn_changePassword)
         self.btn_panel_first.addWidget(self.btn_passGeneration)
+        self.btn_panel_first.addWidget(self.btn_googleDriveDownload)
+        self.btn_panel_first.addWidget(self.btn_googleDriveDischarge)
         
         self.table_of_blocks = QWidget()
         self.table_of_blocks.setLayout(self.blocks_from_data)
@@ -453,6 +473,66 @@ class Window(QWidget):
 
     def change_password(self):
         self.window_changePassword.show()
+
+    def dischargeData_googleDrive(self):
+        """
+        Creating a backup copy, if one has not been created, 
+        otherwise updating the backup copy
+        """
+
+        # authentication of user
+        gauth = GoogleAuth()
+        gauth.LocalWebserverAuth()
+        drive = GoogleDrive(gauth)
+
+        file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+        fileDataFound = True # If the files are found, they do not need to be created again.
+
+        for file_current in file_list:
+            # Updating the backup copy by deleting the 
+            #old version and downloading the new version
+            print(file_list['title'])
+            if 'data.json' == file_current['title']:
+                file_old_data = drive.CreateFile({'id':file_current['id']})
+                file_old_data.Delete() # delete of old version
+                file_new_data = drive.CreateFile({'title': 'data.json'})
+                file_new_data.SetContentFile('data.json')
+                file_new_data.Upload() # upload of new version
+                fileDataFound = False
+            if 'crypto.key' == file_current['title']:
+                file_old_crypto = drive.CreateFile({'id':file_current['id']})
+                file_old_crypto.Delete()
+                file_new_crypto = drive.CreateFile({'title': 'crypto.key'})
+                file_new_crypto.SetContentFile('crypto.key')
+                file_new_crypto.Upload()
+
+        if fileDataFound:
+        # If the files are not found, we make a backup copy
+            file_new_data = drive.CreateFile({'title': 'data.json'})
+            file_new_data.SetContentFile('data.json')
+            file_new_data.Upload()
+            file_new_crypto = drive.CreateFile({'title': 'crypto.key'})
+            file_new_crypto.SetContentFile('crypto.key')
+            file_new_crypto.Upload()
+
+    def downloadData_googleDrive(self):
+        """
+        Downloading the current version of the database
+        """
+        gauth = GoogleAuth()
+        gauth.LocalWebserverAuth()
+        drive = GoogleDrive(gauth)
+
+        file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+
+        for file_current in file_list:
+            # Obtaining a database and a cryptographic key
+            if 'data.json' == file_current['title']:
+                donwload_file_data = drive.CreateFile({'id':file_current['id']})
+                donwload_file_data.GetContentFile("data.json")
+            elif 'crypto.key' == file_current['title']:
+                donwload_file = drive.CreateFile({'id':file_current['id']})
+                donwload_file.GetContentFile("crypto.key")
 
     def password_generate(self):
         self.window_generatePassword.show()
@@ -786,8 +866,15 @@ if __name__ == '__main__':
         with open('data.json', 'r') as file:
             base = json.load(file)
     except Exception:
-        with open('data.json', 'r') as file:
-            base = json.load(file)
+        try:
+            with open('data.json', 'r') as file:
+                base = json.load(file)
+        except FileNotFoundError:
+            data = {"datas": {}, "password": ""}
+            with open('data.json', 'w') as file:
+                json.dump(data, file)
+            with open('data.json', 'r') as file:
+                base = json.load(file)
 
     app = QApplication()
 
