@@ -455,18 +455,26 @@ class Window(QWidget):
         self.btn_panel_first.addWidget(self.btn_updating)
         self.btn_panel_first.addWidget(self.btn_changePassword)
         self.btn_panel_first.addWidget(self.btn_passGeneration)
-        self.btn_panel_first.addWidget(self.btn_googleDriveDownload)
-        self.btn_panel_first.addWidget(self.btn_googleDriveDischarge)
+
+        self.btn_panel_second = QHBoxLayout()
+        self.btn_panel_second.addStretch()
+        self.btn_panel_second.addWidget(self.btn_googleDriveDownload)
+        self.btn_panel_second.addWidget(self.btn_googleDriveDischarge)
+        self.btn_panel_second.addStretch()
         
         self.table_of_blocks = QWidget()
         self.table_of_blocks.setLayout(self.blocks_from_data)
 
-        self.main_btns = QWidget()
-        self.main_btns.setLayout(self.btn_panel_first)
+        self.btns_field_first = QWidget()
+        self.btns_field_first.setLayout(self.btn_panel_first)
+
+        self.btns_field_second = QWidget()
+        self.btns_field_second.setLayout(self.btn_panel_second)
 
         self.main_window = QVBoxLayout()
         self.main_window.addWidget(self.table_of_blocks)
-        self.main_window.addWidget(self.main_btns)
+        self.main_window.addWidget(self.btns_field_first)
+        self.main_window.addWidget(self.btns_field_second)
 
         self.setLayout(self.main_window)
         # Menu layout #######################################
@@ -682,15 +690,7 @@ class RegisterWindow(QWidget):
         self.btn_done.clicked.connect(self.done_window)
         self.btn_done.setObjectName('btn_done')
 
-        self.btn_cancel = QPushButton()
-        self.btn_cancel.setMaximumWidth(100)
-        self.btn_cancel.setMinimumWidth(100)
-        self.btn_cancel.setMaximumHeight(50)
-        self.btn_cancel.setMinimumHeight(50)
-        self.btn_cancel.clicked.connect(self.close_window)
-        self.btn_cancel.setObjectName('btn_Exit')
-
-        self.place_btns = QHBoxLayout()
+        self.place_btn = QHBoxLayout()
         self.place_flags = QHBoxLayout()
         self.place_field_password = QVBoxLayout()
         self.place = QVBoxLayout()
@@ -702,15 +702,14 @@ class RegisterWindow(QWidget):
         self.place_flags.addWidget(self.hidden_password)
         self.place_flags.addWidget(self.stars_password)
 
-        self.place_btns.addWidget(self.btn_done)
-        self.place_btns.addWidget(self.btn_cancel)
+        self.place_btn.addWidget(self.btn_done)
 
         self.place_field_password.addWidget(self.title_signup)
         self.place_field_password.addWidget(self.place_password)
 
         self.part1_window.setLayout(self.place_field_password)
         self.part2_window.setLayout(self.place_flags)
-        self.part3_window.setLayout(self.place_btns)
+        self.part3_window.setLayout(self.place_btn)
 
         self.place.addWidget(self.part1_window)
         self.place.addWidget(self.part2_window)

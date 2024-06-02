@@ -6,6 +6,7 @@ QLabel#title_start_window {
     background: none;
     color: white;
     font: 25px bold;
+    margin-left: 120px;
 }
 
 QDialog {
