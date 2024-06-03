@@ -487,60 +487,65 @@ class Window(QWidget):
         Creating a backup copy, if one has not been created, 
         otherwise updating the backup copy
         """
+        try:
+            # authentication of user
+            gauth = GoogleAuth()
+            gauth.LocalWebserverAuth()
+            drive = GoogleDrive(gauth)
 
-        # authentication of user
-        gauth = GoogleAuth()
-        gauth.LocalWebserverAuth()
-        drive = GoogleDrive(gauth)
+            file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+            fileDataFound = True # If the files are found, they do not need to be created again.
 
-        file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
-        fileDataFound = True # If the files are found, they do not need to be created again.
+            for file_current in file_list:
+                # Updating the backup copy by deleting the 
+                #old version and downloading the new version
+                print(file_list['title'])
+                if 'data.json' == file_current['title']:
+                    file_old_data = drive.CreateFile({'id':file_current['id']})
+                    file_old_data.Delete() # delete of old version
+                    file_new_data = drive.CreateFile({'title': 'data.json'})
+                    file_new_data.SetContentFile('data.json')
+                    file_new_data.Upload() # upload of new version
+                    fileDataFound = False
+                if 'crypto.key' == file_current['title']:
+                    file_old_crypto = drive.CreateFile({'id':file_current['id']})
+                    file_old_crypto.Delete()
+                    file_new_crypto = drive.CreateFile({'title': 'crypto.key'})
+                    file_new_crypto.SetContentFile('crypto.key')
+                    file_new_crypto.Upload()
 
-        for file_current in file_list:
-            # Updating the backup copy by deleting the 
-            #old version and downloading the new version
-            print(file_list['title'])
-            if 'data.json' == file_current['title']:
-                file_old_data = drive.CreateFile({'id':file_current['id']})
-                file_old_data.Delete() # delete of old version
+            if fileDataFound:
+            # If the files are not found, we make a backup copy
                 file_new_data = drive.CreateFile({'title': 'data.json'})
                 file_new_data.SetContentFile('data.json')
-                file_new_data.Upload() # upload of new version
-                fileDataFound = False
-            if 'crypto.key' == file_current['title']:
-                file_old_crypto = drive.CreateFile({'id':file_current['id']})
-                file_old_crypto.Delete()
+                file_new_data.Upload()
                 file_new_crypto = drive.CreateFile({'title': 'crypto.key'})
                 file_new_crypto.SetContentFile('crypto.key')
                 file_new_crypto.Upload()
-
-        if fileDataFound:
-        # If the files are not found, we make a backup copy
-            file_new_data = drive.CreateFile({'title': 'data.json'})
-            file_new_data.SetContentFile('data.json')
-            file_new_data.Upload()
-            file_new_crypto = drive.CreateFile({'title': 'crypto.key'})
-            file_new_crypto.SetContentFile('crypto.key')
-            file_new_crypto.Upload()
+        except Exception:
+            pass
 
     def downloadData_googleDrive(self):
         """
         Downloading the current version of the database
         """
-        gauth = GoogleAuth()
-        gauth.LocalWebserverAuth()
-        drive = GoogleDrive(gauth)
+        try:
+            gauth = GoogleAuth()
+            gauth.LocalWebserverAuth()
+            drive = GoogleDrive(gauth)
 
-        file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+            file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
 
-        for file_current in file_list:
-            # Obtaining a database and a cryptographic key
-            if 'data.json' == file_current['title']:
-                donwload_file_data = drive.CreateFile({'id':file_current['id']})
-                donwload_file_data.GetContentFile("data.json")
-            elif 'crypto.key' == file_current['title']:
-                donwload_file = drive.CreateFile({'id':file_current['id']})
-                donwload_file.GetContentFile("crypto.key")
+            for file_current in file_list:
+                # Obtaining a database and a cryptographic key
+                if 'data.json' == file_current['title']:
+                    donwload_file_data = drive.CreateFile({'id':file_current['id']})
+                    donwload_file_data.GetContentFile("data.json")
+                elif 'crypto.key' == file_current['title']:
+                    donwload_file = drive.CreateFile({'id':file_current['id']})
+                    donwload_file.GetContentFile("crypto.key")
+        except Exception:
+            pass
 
     def password_generate(self):
         self.window_generatePassword.show()
