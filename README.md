@@ -27,6 +27,37 @@ or your other compiler
 Remove the **"epse"** binary file from the **CLI/Linux/bin** directory and move it to the **/usr/bin/** directory or the directory for binary files of your system.
 
 ### Screenshot
-<img src="img/epse_cli.png">
+<img src="img/epse_cli.svg">
+
+# <img src="img/application.svg" width=30 height=30> EPSE Desktop 
+### **Description**
+* To work, you need to register by creating a password for further login
+* In the program, everything is divided into blocks, a block has a name and data, each data has a name
+* The name and/or data can be any
+* Data and/or names can be edited, deleted, added
+* Generating a password of any length
+* Changing the password to log in to the program
+* You can create and/or upload a backup in your Google Drive
+
+## <img src="img/build.svg" width=30 height=30> Build
+### Dependencies
+* `pip install json` — to work with the database
+* `pip install pyside6` — GUI of the entire application
+* `pip install cryptography` — to encrypt the database
+* `pip install pydrive` — to work with Google Drive cloud storage
+* `pip install nuitka` — for compiling from sources
+
+### Compilation
+`nuitka --windows-disable-console --output-dir=bin --windows-icon-from-ico="C:\Users\Watoc\PasswordManagerEPSE\Desktop\Windows\img\icon_main_window.ico" --remove-output --jobs=4 epse_desktop.py` for Windows
+or your other compiler
+
+`nuitka --output-dir=bin --linux-icon="C:\Users\Watoc\PasswordManagerEPSE\Desktop\Windows\img\icon_main_window.ico" --remove-output --jobs=4 epse_desktop.py` for Linux
+or your other compiler
+
+## <img src="img/user_account.svg" width=30 height=30> Using a ready-made program
+Your database can be located either locally on your computer or cloud-based in storage
+
+### Screenshot
+<img src="img/epse_desktop.svg">
 
 ## <img src="img/donwload.svg" width=30 height=30> <a href='https://github.com/watocmasc/PasswordManagerEPSE/archive/refs/heads/main.zip'>Download the sources right now</a>
