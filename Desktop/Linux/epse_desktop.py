@@ -335,7 +335,7 @@ class CreateBlock(QDialog):
 
         # new block in base
         if self.place_title.text() and self.place_content.text():
-            base['datas'][self.place_title.text()] = self.place_content.text().split()
+            base['datas'][self.place_title.text().strip()] = self.place_content.text().split()
 
         with open(f'{home_dir}/.config/epse-config/data.json', 'w') as file:
             json.dump(base, file)

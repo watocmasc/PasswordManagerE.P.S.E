@@ -333,7 +333,7 @@ class CreateBlock(QDialog):
 
         # new block in base
         if self.place_title.text() and self.place_content.text():
-            base['datas'][self.place_title.text()] = self.place_content.text().split()
+            base['datas'][self.place_title.text().strip()] = self.place_content.text().split()
 
         with open('data.json', 'w') as file:
             json.dump(base, file)
