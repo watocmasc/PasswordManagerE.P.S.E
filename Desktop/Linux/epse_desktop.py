@@ -1,4 +1,4 @@
-import sys, json
+import sys, json, os
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
@@ -6,11 +6,13 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import cipher as cr
 
+home_dir = os.path.expanduser("~")
+
 class ChangePassword(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowIcon(QIcon(QPixmap(f"{home_dir}/.config/epse-config/img/icon_main_window.png")))
         self.setWindowTitle("Changing the password")
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
@@ -73,8 +75,8 @@ class ChangePassword(QDialog):
         self.close()
 
     def done_window(self):
-        cr.decrypt('data.json', cr.load_key())
-        with open('data.json', 'r') as file:
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
 
         # new block in base
@@ -82,13 +84,13 @@ class ChangePassword(QDialog):
             if self.place_new_password.text().strip():
                 base['password'] = self.place_new_password.text().strip()
 
-                with open('data.json', 'w') as file:
+                with open(f'{home_dir}/.config/epse-config/data.json', 'w') as file:
                     json.dump(base, file)
                         
                 self.place_old_password.clear()
                 self.place_new_password.clear()
                 self.close()
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
 class PasswordGeneration(QWidget):
     def __init__(self):
@@ -96,7 +98,7 @@ class PasswordGeneration(QWidget):
 
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
-        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowIcon(QIcon(QPixmap(f"{home_dir}/.config/epse-config/img/icon_main_window.png")))
         self.setWindowTitle("Password generation")
 
         self.place_new_password = QLineEdit()
@@ -163,7 +165,7 @@ class ContentBlock(QWidget):
     def __init__(self, number_of_block, title_block, value_of_block):
         super().__init__()
             
-        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))    
+        self.setWindowIcon(QIcon(QPixmap(f"{home_dir}/.config/epse-config/img/icon_main_window.png")))    
         self.setWindowTitle("Block Data")
 
         # Propertions of main window
@@ -235,8 +237,8 @@ class ContentBlock(QWidget):
         # Menu layout #######################################
         
     def save_changes(self):
-        cr.decrypt('data.json', cr.load_key())
-        with open('data.json', 'r') as file:
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
 
         # Finds the required data block, 
@@ -253,9 +255,9 @@ class ContentBlock(QWidget):
 
             score_key += 1
 
-        with open('data.json', 'w') as file:
+        with open(f'{home_dir}/.config/epse-config/data.json', 'w') as file:
             json.dump(base, file)
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
         self.close()
 
@@ -266,7 +268,7 @@ class CreateBlock(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowIcon(QIcon(QPixmap(f"{home_dir}/.config/epse-config/img/icon_main_window.png")))
         self.setWindowTitle("Adding new data")
         self.setMinimumHeight(200)
         self.setMinimumWidth(400)
@@ -327,17 +329,17 @@ class CreateBlock(QDialog):
         return self.close()
 
     def done_window(self):
-        cr.decrypt('data.json', cr.load_key())
-        with open('data.json', 'r') as file:
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
 
         # new block in base
         if self.place_title.text() and self.place_content.text():
             base['datas'][self.place_title.text()] = self.place_content.text().split()
 
-        with open('data.json', 'w') as file:
+        with open(f'{home_dir}/.config/epse-config/data.json', 'w') as file:
             json.dump(base, file)
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
         
         self.place_title.clear()
         self.place_content.clear()
@@ -347,7 +349,7 @@ class Window(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowIcon(QIcon(QPixmap(f"{home_dir}/.config/epse-config/img/icon_main_window.png")))
 
         # Propertions of main window
         self.setWindowTitle("EPSE")
@@ -372,9 +374,9 @@ class Window(QWidget):
         self.blocks_of_data.setObjectName('blocks_of_data')
 
         # content of main windowf
-        cr.decrypt('data.json', cr.load_key())
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
-        with open('data.json', 'r') as file:
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
         queue_block = 1
         for title in base['datas'].keys():
@@ -384,7 +386,7 @@ class Window(QWidget):
         for title_item in self.titles_blocks:
             self.blocks_of_data.addItem(title_item)
 
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
         # The contents of the main window #######################################
 
         # Buttons #######################################
@@ -499,29 +501,36 @@ class Window(QWidget):
             for file_current in file_list:
                 # Updating the backup copy by deleting the 
                 #old version and downloading the new version
-                print(file_list['title'])
-                if 'data.json' == file_current['title']:
+                if f'{home_dir}/.config/epse-config/data.json' == file_current['title']:
                     file_old_data = drive.CreateFile({'id':file_current['id']})
                     file_old_data.Delete() # delete of old version
-                    file_new_data = drive.CreateFile({'title': 'data.json'})
-                    file_new_data.SetContentFile('data.json')
+                    file_new_data = drive.CreateFile({'title': f'{home_dir}/.config/epse-config/data.json'})
+                    file_new_data.SetContentFile(f'{home_dir}/.config/epse-config/data.json')
                     file_new_data.Upload() # upload of new version
                     fileDataFound = False
-                if 'crypto.key' == file_current['title']:
+                else:
+                    print("False")
+
+                if f"{home_dir}/.config/epse-config/crypto.key" == file_current['title']:
                     file_old_crypto = drive.CreateFile({'id':file_current['id']})
                     file_old_crypto.Delete()
-                    file_new_crypto = drive.CreateFile({'title': 'crypto.key'})
-                    file_new_crypto.SetContentFile('crypto.key')
+                    file_new_crypto = drive.CreateFile({'title': f"{home_dir}/.config/epse-config/crypto.key"})
+                    file_new_crypto.SetContentFile(f"{home_dir}/.config/epse-config/crypto.key")
                     file_new_crypto.Upload()
+                else:
+                    print("False")
 
             if fileDataFound:
             # If the files are not found, we make a backup copy
-                file_new_data = drive.CreateFile({'title': 'data.json'})
-                file_new_data.SetContentFile('data.json')
+                file_new_data = drive.CreateFile({'title': f'{home_dir}/.config/epse-config/data.json'})
+                file_new_data.SetContentFile(f'{home_dir}/.config/epse-config/data.json')
                 file_new_data.Upload()
-                file_new_crypto = drive.CreateFile({'title': 'crypto.key'})
-                file_new_crypto.SetContentFile('crypto.key')
+
+                file_new_crypto = drive.CreateFile({'title': f"{home_dir}/.config/epse-config/crypto.key"})
+                file_new_crypto.SetContentFile(f"{home_dir}/.config/epse-config/crypto.key")
                 file_new_crypto.Upload()
+            else:
+                print("False")
         except Exception:
             pass
 
@@ -538,12 +547,13 @@ class Window(QWidget):
 
             for file_current in file_list:
                 # Obtaining a database and a cryptographic key
-                if 'data.json' == file_current['title']:
+                if f'{home_dir}/.config/epse-config/data.json' == file_current['title']:
                     donwload_file_data = drive.CreateFile({'id':file_current['id']})
-                    donwload_file_data.GetContentFile("data.json")
-                elif 'crypto.key' == file_current['title']:
+                    donwload_file_data.GetContentFile(f'{home_dir}/.config/epse-config/data.json')
+
+                elif f'{home_dir}/.config/epse-config/crypto.key' == file_current['title']:
                     donwload_file = drive.CreateFile({'id':file_current['id']})
-                    donwload_file.GetContentFile("crypto.key")
+                    donwload_file.GetContentFile(f"{home_dir}/.config/epse-config/crypto.key")
         except Exception:
             pass
 
@@ -555,7 +565,7 @@ class Window(QWidget):
 
     # Viewing the contents of the title
     def full_review_of_block(self):
-        cr.decrypt('data.json', cr.load_key())
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
         selectedBlock = self.blocks_of_data.currentItem()
         numberBlock = ""
@@ -565,7 +575,7 @@ class Window(QWidget):
             else:
                 break
         
-        with open('data.json', 'r') as file:
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
 
         count = 0
@@ -579,16 +589,16 @@ class Window(QWidget):
         self.window_content = ContentBlock(int(numberBlock)-1, key_in_base, items)
         self.window_content.show()
 
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
     # updating of content for main window
     def updating(self):
-        cr.decrypt('data.json', cr.load_key())
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
         self.blocks_of_data.clear()
         self.all_blocks = []
 
-        with open('data.json', 'r') as file:
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
         queue_block = 1
         for i in base['datas'].keys():
@@ -598,7 +608,7 @@ class Window(QWidget):
         for k in self.all_blocks:
             self.blocks_of_data.addItem(k)
 
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
     # deletes a block of data from the manager
     def del_block_of_data(self):
@@ -614,8 +624,8 @@ class Window(QWidget):
                     break
             ####################################
             #
-            cr.decrypt('data.json', cr.load_key())
-            with open('data.json', 'r') as file:
+            cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
+            with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
                 base = json.load(file)
 
             # find the necessary element to delete
@@ -629,10 +639,10 @@ class Window(QWidget):
                 count += 1
             del base['datas'][key_in_base]
 
-            with open('data.json', 'w') as file:
+            with open(f'{home_dir}/.config/epse-config/data.json', 'w') as file:
                 json.dump(base, file)
 
-            cr.encrypt('data.json', cr.load_key())
+            cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
             #
             ####################################
         except:
@@ -650,7 +660,7 @@ class RegisterWindow(QWidget):
         self.setMinimumWidth(400)
         self.setMaximumHeight(300)
         self.setMaximumWidth(400)
-        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowIcon(QIcon(QPixmap(f"{home_dir}/.config/epse-config/img/icon_main_window.png")))
         self.setWindowTitle("Sign up")
 
         self.window = Window()
@@ -739,21 +749,21 @@ class RegisterWindow(QWidget):
             self.stars_password.setText("123")
 
     def done_window(self):
-        cr.decrypt('data.json', cr.load_key())
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
-        with open('data.json', 'r') as file:
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
 
         if(self.place_password.text()):
             base['password'] = self.place_password.text().strip()
 
-            with open('data.json', 'w') as file:
+            with open(f'{home_dir}/.config/epse-config/data.json', 'w') as file:
                 json.dump(base, file)
                 
             self.window.show()
 
             self.close()
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
     def close_window(self):
         self.close()
@@ -766,7 +776,7 @@ class LoginWindow(QWidget):
         self.setMinimumWidth(400)
         self.setMaximumHeight(300)
         self.setMaximumWidth(400)
-        self.setWindowIcon(QIcon(QPixmap("img/icon_main_window.png")))
+        self.setWindowIcon(QIcon(QPixmap(f"{home_dir}/.config/epse-config/img/icon_main_window.png")))
         self.setWindowTitle("Sign in")
 
         self.window = Window()
@@ -850,49 +860,51 @@ class LoginWindow(QWidget):
             self.stars_password.setText("123")
 
     def done_window(self):
-        cr.decrypt('data.json', cr.load_key())
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
-        with open('data.json', 'r') as file:
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
 
         if(self.place_password.text().strip() == base['password']):
             self.window.show()
             self.close()
 
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
 
     def close_window(self):
         self.close()
 
 if __name__ == '__main__':
+    if not(os.path.isdir(f"{home_dir}/.config/epse-config")):
+        os.mkdir(f'{home_dir}/.config/epse-config')
     try:
-        cr.decrypt('data.json', cr.load_key())
-        with open('data.json', 'r') as file:
+        cr.decrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
+        with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
             base = json.load(file)
     except Exception:
         try:
-            with open('data.json', 'r') as file:
+            with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
                 base = json.load(file)
         except FileNotFoundError:
             data = {"datas": {}, "password": ""}
-            with open('data.json', 'w') as file:
+            with open(f'{home_dir}/.config/epse-config/data.json', 'w') as file:
                 json.dump(data, file)
-            with open('data.json', 'r') as file:
+            with open(f'{home_dir}/.config/epse-config/data.json', 'r') as file:
                 base = json.load(file)
 
     app = QApplication()
 
     if(base['password']):
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
         loginWindow = LoginWindow()
         loginWindow.show()
     else:
         cr.write_key()
-        cr.encrypt('data.json', cr.load_key())
+        cr.encrypt(f'{home_dir}/.config/epse-config/data.json', cr.load_key())
         registerWindow = RegisterWindow()
         registerWindow.show()
 
-    with open("style.qss", 'r') as f:
+    with open(f"{home_dir}/PasswordManagerEPSE/Desktop/Linux/style.qss", 'r') as f:
         _style = f.read()
         app.setStyleSheet(_style)
 
